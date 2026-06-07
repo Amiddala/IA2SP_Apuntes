@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cap. 2 · Procesamiento de Lenguaje Natural</title>
+  <style>
+    :root{--bg:#0d0f14;--bg2:#12151c;--surface:#181c26;--border:#252a38;--text:#e2e6f0;--muted:#7a849a;--accent:#38cfb4;--accent-dim:#0e3530;--green:#38cfb4;--orange:#e88c5a;--red:#e05c6a;--blue:#5b7fff;--font-head:'Georgia','Times New Roman',serif;--font-body:'Segoe UI','Helvetica Neue',Arial,sans-serif;--font-mono:'Courier New',Courier,monospace;--max-w:800px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.8}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:.85rem 2rem;gap:1rem;flex-wrap:wrap}
+    .nav-back{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);transition:color .2s}
+    .nav-back:hover{color:var(--text);text-decoration:none}
+    .nav-back::before{content:'← '}
+    .nav-title{font-family:var(--font-head);font-size:.95rem;color:var(--text);flex:1;text-align:center}
+    .nav-next{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);transition:color .2s}
+    .nav-next:hover{color:var(--text);text-decoration:none}
+    .nav-next::after{content:' →'}
+    .nav-prev{display:inline-flex;align-items:center;font-size:.82rem;color:var(--muted);transition:color .2s}
+    .nav-prev:hover{color:var(--text);text-decoration:none}
+    .nav-prev::before{content:'← '}
+    .ch-header{max-width:var(--max-w);margin:0 auto;padding:4rem 2rem 2.5rem}
+    .ch-tag{display:inline-block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-dim);background:rgba(56,207,180,.06);padding:.3rem .85rem;border-radius:99px;margin-bottom:1.2rem}
+    .ch-header h1{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.2rem);font-weight:400;letter-spacing:-.025em;line-height:1.2;margin-bottom:1rem}
+    .ch-header .lead{color:var(--muted);max-width:600px;font-size:1.05rem}
+    .ch-divider{max-width:var(--max-w);margin:2rem auto 0;border:none;border-top:1px solid var(--border)}
+    main{max-width:var(--max-w);margin:0 auto;padding:3rem 2rem 6rem}
+    .toc{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.5rem 1.8rem;margin-bottom:3.5rem}
+    .toc h4{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+    .toc ol{padding-left:1.2rem}
+    .toc li{font-size:.88rem;color:var(--muted);margin-bottom:.35rem}
+    .toc li a{color:var(--muted);transition:color .2s}
+    .toc li a:hover{color:var(--accent);text-decoration:none}
+    h2{font-family:var(--font-head);font-size:1.75rem;font-weight:400;letter-spacing:-.02em;margin:3.5rem 0 1rem;color:var(--text);padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+    h3{font-family:var(--font-head);font-size:1.2rem;font-weight:400;margin:2rem 0 .6rem;color:var(--text)}
+    h3::before{content:'// ';color:var(--accent);font-family:var(--font-mono);font-size:.9em}
+    p{margin-bottom:1rem;color:var(--text)}
+    ul,ol{padding-left:1.4rem;margin-bottom:1rem}
+    li{margin-bottom:.4rem;color:var(--muted)}
+    li strong{color:var(--text)}
+    .concept{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem 1.8rem;margin:1.5rem 0}
+    .concept-title{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+    .concept p{color:var(--muted);margin:0}
+    .formula{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:8px;padding:1rem 1.5rem;font-family:var(--font-mono);font-size:.88rem;color:var(--green);margin:1.2rem 0;overflow-x:auto;white-space:pre-wrap}
+    .formula .note{color:var(--muted);font-size:.78rem;display:block;margin-top:.4rem;font-family:var(--font-body)}
+    .alert{border-left:3px solid var(--orange);background:rgba(232,140,90,.06);border-radius:0 8px 8px 0;padding:1rem 1.4rem;margin:1.5rem 0;font-size:.92rem;color:var(--muted)}
+    .alert strong{color:var(--orange)}
+    .procon{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0}
+    @media(max-width:520px){.procon{grid-template-columns:1fr}}
+    .procon-box{border-radius:10px;padding:1.1rem 1.3rem}
+    .pros{background:rgba(56,207,180,.06);border:1px solid rgba(56,207,180,.2)}
+    .cons{background:rgba(224,92,106,.06);border:1px solid rgba(224,92,106,.2)}
+    .procon-box h5{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.7rem}
+    .pros h5{color:var(--green)}
+    .cons h5{color:var(--red)}
+    .procon-box ul{padding-left:1.1rem;margin:0}
+    .procon-box li{font-size:.85rem;margin-bottom:.3rem;color:var(--muted)}
+    .steps{counter-reset:step;list-style:none;padding:0;margin:1.2rem 0}
+    .steps li{counter-increment:step;display:flex;gap:1rem;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid var(--border);color:var(--text);font-size:.92rem}
+    .steps li:last-child{border-bottom:none}
+    .steps li::before{content:counter(step,decimal-leading-zero);font-family:var(--font-mono);font-size:.75rem;color:var(--accent);min-width:28px;padding-top:.1rem}
+    .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0}
+    .tag{font-size:.68rem;letter-spacing:.07em;padding:.22rem .65rem;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--bg2)}
+    .section-anchor{scroll-margin-top:70px}
+    .footer-nav{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding:2rem;max-width:var(--max-w);margin:0 auto;flex-wrap:wrap;gap:1rem}
+    .footer-nav a{font-size:.85rem;color:var(--muted);transition:color .2s}
+    .footer-nav a:hover{color:var(--text);text-decoration:none}
+    .footer-nav .prev::before{content:'← '}
+    .footer-nav .next::after{content:' →'}
+    table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.88rem}
+    th{background:var(--surface);color:var(--accent);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1rem;text-align:left;border-bottom:2px solid var(--border)}
+    td{padding:.6rem 1rem;border-bottom:1px solid var(--border);color:var(--muted)}
+    tr:last-child td{border-bottom:none}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="cap1.html" class="nav-back">Cap. 1</a>
+  <span class="nav-title">Cap. 2 · Procesamiento de Lenguaje Natural</span>
+  <a href="cap3.html" class="nav-next">Cap. 3</a>
+</nav>
+
+<div class="ch-header">
+  <span class="ch-tag">Capítulo 02</span>
+  <h1>Procesamiento de Lenguaje Natural</h1>
+  <p class="lead">De la representación matemática del texto a los Transformers y LLMs: fundamentos, modelos clásicos, Deep Learning y subareas del PLN moderno.</p>
+</div>
+<hr class="ch-divider" />
+
+<main>
+
+  <nav class="toc">
+    <h4>Contenido</h4>
+    <ol>
+      <li><a href="#fundamentos">1. ¿Qué es el PLN?</a></li>
+      <li><a href="#problemas">2. Problemas fundamentales del lenguaje</a></li>
+      <li><a href="#pipeline">3. Pipeline clásico de PLN</a></li>
+      <li><a href="#representacion">4. Representación matemática del lenguaje</a></li>
+      <li><a href="#clasicos">5. Modelos clásicos (Naive Bayes, HMM, CRF)</a></li>
+      <li><a href="#deeplearning">6. Deep Learning en PLN (RNN, LSTM, GRU)</a></li>
+      <li><a href="#transformers">7. Transformers y LLMs</a></li>
+      <li><a href="#subareas">8. Subareas del PLN</a></li>
+    </ol>
+  </nav>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="fundamentos" class="section-anchor">1. ¿Qué es el PLN?</h2>
+
+  <p>El <strong>Procesamiento de Lenguaje Natural (PLN / NLP)</strong> es el área de la IA que permite a las computadoras leer, interpretar, clasificar, responder y generar lenguaje humano de forma útil.</p>
+
+  <div class="concept">
+    <div class="concept-title">Formalización básica</div>
+    <p>La mayoría de tareas de PLN se modelan como: dada una entrada x (texto), elegir la salida ŷ más probable:</p>
+  </div>
+  <div class="formula">ŷ = argmax_y  P(y | x; θ)
+<span class="note">Y = conjunto de salidas posibles | θ = parámetros del modelo | argmax = elegir la más probable</span></div>
+
+  <h3>Niveles lingüísticos que analiza el PLN</h3>
+  <table>
+    <tr><th>Nivel</th><th>Qué analiza</th><th>Ejemplo</th></tr>
+    <tr><td>Fonológico</td><td>Sonidos del habla</td><td>Transcripción de voz a texto</td></tr>
+    <tr><td>Morfológico</td><td>Partes y formas de las palabras</td><td>"estudié", "estudiando" → "estudiar"</td></tr>
+    <tr><td>Sintáctico</td><td>Estructura de la oración</td><td>Sujeto, verbo, complemento</td></tr>
+    <tr><td>Semántico</td><td>Significado de las palabras</td><td>"banco" = entidad financiera o asiento</td></tr>
+    <tr><td>Pragmático</td><td>Intención y contexto</td><td>Ironía, preguntas retóricas</td></tr>
+    <tr><td>Discursivo</td><td>Relación entre oraciones</td><td>Correferencia: "María… ella…"</td></tr>
+  </table>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="problemas" class="section-anchor">2. Problemas fundamentales del lenguaje</h2>
+
+  <h3>Ambigüedad léxica</h3>
+  <p>Una misma palabra puede tener múltiples significados. La tarea de elegir el correcto en contexto se llama <strong>WSD (Word Sense Disambiguation)</strong>.</p>
+  <ul>
+    <li><strong>Homonimia:</strong> "banco" (institución) vs. "banco" (asiento).</li>
+    <li><strong>Polisemia:</strong> "cabeza" como parte del cuerpo, líder de un grupo o inicio de una lista.</li>
+  </ul>
+
+  <h3>Ambigüedad sintáctica</h3>
+  <p>"Vi al estudiante con el telescopio." → ¿Yo usé el telescopio? ¿O el estudiante lo tenía? El número de interpretaciones crece combinatoriamente con la longitud de la oración (números de Catalan), por eso se necesitan algoritmos eficientes como CYK o modelos de atención.</p>
+
+  <h3>Variabilidad morfológica y normalización</h3>
+  <p>La misma idea puede expresarse de muchas formas. Para homogeneizarlas:</p>
+  <div class="procon">
+    <div class="procon-box pros">
+      <h5>Lematización</h5>
+      <ul>
+        <li>Lleva a la forma de diccionario</li>
+        <li>{estudié, estudian} → estudiar</li>
+        <li>Requiere análisis morfológico completo</li>
+      </ul>
+    </div>
+    <div class="procon-box cons">
+      <h5>Stemming</h5>
+      <ul>
+        <li>Corta sufijos por reglas simples</li>
+        <li>Más rápido, menos preciso</li>
+        <li>Puede producir formas que no son palabras</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Dependencias de largo alcance</h3>
+  <p>El sujeto de una oración puede estar muy lejos de su verbo principal. Las RNNs básicas "olvidan" el inicio al llegar al final (problema del gradiente que desaparece), lo que motivó LSTM y Transformers.</p>
+
+  <h3>Ley de Zipf y vocabulario abierto (OOV)</h3>
+  <p>En cualquier corpus, pocas palabras aparecen muchísimas veces y muchísimas palabras aparecen muy pocas veces. Siempre aparecen palabras nuevas no vistas en entrenamiento (OOV). Solución moderna: <strong>segmentación en subpalabras</strong> (BPE, WordPiece, SentencePiece).</p>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="pipeline" class="section-anchor">3. Pipeline clásico de PLN</h2>
+
+  <p>El pipeline clásico encadena módulos donde la salida de cada etapa es la entrada de la siguiente. Un error en etapas tempranas se propaga a todas las siguientes.</p>
+
+  <ol class="steps">
+    <li><strong>Tokenización:</strong> divide el texto en unidades (tokens). BPE maneja palabras desconocidas mediante subpalabras.</li>
+    <li><strong>Normalización:</strong> lematización, eliminación de stop words.</li>
+    <li><strong>Etiquetado POS:</strong> asigna categoría gramatical (N, V, ADJ…) a cada token.</li>
+    <li><strong>Análisis de dependencias:</strong> construye el árbol sintáctico de la oración.</li>
+    <li><strong>NER:</strong> reconoce entidades nombradas (personas, organizaciones, lugares).</li>
+    <li><strong>Tarea final:</strong> clasificación, extracción de información, generación, etc.</li>
+  </ol>
+
+  <table>
+    <tr><th>Dimensión</th><th>Pipeline clásico</th><th>Extremo a extremo (Transformers)</th></tr>
+    <tr><td>Propagación de errores</td><td>Alta, se acumula</td><td>Baja, optimización conjunta</td></tr>
+    <tr><td>Interpretabilidad</td><td>Alta</td><td>Baja (espacio latente opaco)</td></tr>
+    <tr><td>Datos necesarios</td><td>Anotaciones en cada nivel</td><td>Preentrenamiento no supervisado</td></tr>
+    <tr><td>Rendimiento</td><td>Moderado</td><td>Estado del arte</td></tr>
+  </table>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="representacion" class="section-anchor">4. Representación matemática del lenguaje</h2>
+
+  <h3>Bag of Words (BoW)</h3>
+  <p>Cada documento es un vector de conteos de palabras. Ignora el orden y no captura similitud semántica (sinónimos tienen vectores ortogonales).</p>
+  <div class="formula">[x_d]_i = count(v_i, d)   →  vector disperso de dimensión |V|
+<span class="note">Densidad típica ≈ 0.4% para vocabularios de 50 000 palabras</span></div>
+
+  <h3>TF-IDF</h3>
+  <p>Pondera cada término por su relevancia local (frecuencia en el documento) y su especificidad global (rareza en el corpus). Los términos muy comunes ("el", "de") reciben peso 0.</p>
+  <div class="formula">w(t,d) = TF(t,d) × IDF(t,D)
+TF = 1 + log(count)          IDF = log((N+1)/(df+1)) + 1
+<span class="note">Similitud entre documentos: coseno de sus vectores TF-IDF normalizados</span></div>
+
+  <h3>Word Embeddings — representación densa</h3>
+  <p>Aprenden un mapeo de cada palabra a un vector denso en ℝᵈ (d ≈ 100–300) basándose en la <em>hipótesis distribucional</em>: palabras con contextos similares tienen significados similares.</p>
+
+  <table>
+    <tr><th>Método</th><th>Idea central</th><th>Característica clave</th></tr>
+    <tr><td>Word2Vec / Skip-gram</td><td>Predice palabras de contexto a partir de la central</td><td>Rápido; analogías lineales (rey − hombre + mujer ≈ reina)</td></tr>
+    <tr><td>GloVe</td><td>Factoriza la matriz de co-ocurrencias global</td><td>Combina estadísticas globales y locales</td></tr>
+    <tr><td>BERT / GPT (contextuales)</td><td>Embedding varía según el contexto de uso</td><td>Resuelve polisemia; muy costoso</td></tr>
+  </table>
+
+  <div class="alert"><strong>Limitación de embeddings estáticos:</strong> "banco" (asiento) y "banco" (institución) comparten el mismo vector. Los embeddings contextuales (BERT) asignan vectores distintos según el contexto.</div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="clasicos" class="section-anchor">5. Modelos clásicos de PLN</h2>
+
+  <h3>Naive Bayes</h3>
+  <p>Clasifica texto asumiendo <strong>independencia condicional</strong> entre palabras dada la clase. Simple pero sorprendentemente robusto para clasificación de documentos (spam, sentimiento).</p>
+  <ul>
+    <li><strong>Ventaja:</strong> rápido, funciona bien con pocos datos.</li>
+    <li><strong>Limitación:</strong> ignora el orden; si una palabra no aparece en entrenamiento su probabilidad es 0 (se resuelve con suavizado de Laplace).</li>
+  </ul>
+
+  <h3>Modelos Ocultos de Markov (HMM)</h3>
+  <p>Modela secuencias como estados ocultos (etiquetas POS) que generan observaciones (palabras). La suposición de Markov limita la dependencia al estado anterior.</p>
+  <div class="formula">ŷ = argmax_t  Π P(w_i|t_i) · P(t_i|t_{i-1})
+<span class="note">Se resuelve con el algoritmo de Viterbi en O(n·|T|²)</span></div>
+  <p>Tres problemas fundamentales: <strong>evaluación</strong> (Forward), <strong>decodificación</strong> (Viterbi), <strong>aprendizaje</strong> (Baum-Welch).</p>
+
+  <h3>Campos Aleatorios Condicionales (CRF)</h3>
+  <p>Modelo discriminativo que modela directamente P(y|x). A diferencia del HMM, sus funciones de características pueden depender de <strong>toda la secuencia de entrada</strong>, no solo del token local.</p>
+  <div class="procon">
+    <div class="procon-box pros">
+      <h5>CRF frente a HMM</h5>
+      <ul>
+        <li>Contexto global (ve toda la oración)</li>
+        <li>Características ricas (mayúsculas, sufijos…)</li>
+        <li>Estado del arte en NER y POS clásico</li>
+      </ul>
+    </div>
+    <div class="procon-box cons">
+      <h5>Limitación compartida</h5>
+      <ul>
+        <li>Requiere ingeniería manual de características</li>
+        <li>No aprende representaciones automáticamente</li>
+        <li>Superado por Deep Learning en la mayoría de tareas</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="deeplearning" class="section-anchor">6. Deep Learning en PLN</h2>
+
+  <p>El Deep Learning elimina la necesidad de diseñar características a mano: la red las aprende automáticamente a partir de datos.</p>
+
+  <h3>Redes Neuronales Recurrentes (RNN)</h3>
+  <p>Procesan la secuencia token a token, manteniendo un estado oculto hₜ que acumula información anterior. El mismo conjunto de pesos se aplica en cada paso temporal.</p>
+  <div class="alert"><strong>Problema del gradiente que desaparece:</strong> en oraciones largas, la señal de aprendizaje se multiplica por muchos jacobianos y puede volverse insignificante. El modelo "olvida" el inicio de la oración al llegar al final.</div>
+
+  <h3>LSTM — Long Short-Term Memory</h3>
+  <p>Introduce un <strong>estado de memoria explícito cₜ</strong> controlado por tres compuertas:</p>
+  <ul>
+    <li><strong>Compuerta de olvido fₜ:</strong> decide qué olvidar del estado anterior.</li>
+    <li><strong>Compuerta de entrada iₜ:</strong> decide qué información nueva agregar.</li>
+    <li><strong>Compuerta de salida oₜ:</strong> decide qué exponer como estado oculto.</li>
+  </ul>
+  <div class="formula">c_t = f_t ⊙ c_{t-1}  +  i_t ⊙ c̃_t
+h_t = o_t ⊙ tanh(c_t)
+<span class="note">⊙ = producto elemento a elemento | La ruta c_t provee gradiente cercano a la identidad</span></div>
+
+  <h3>GRU — Gated Recurrent Unit</h3>
+  <p>Versión simplificada de la LSTM: fusiona las compuertas de entrada y olvido en una única <strong>compuerta de actualización zₜ</strong>. Menos parámetros, similar rendimiento en la mayoría de tareas, entrenamiento más rápido.</p>
+
+  <table>
+    <tr><th>Arquitectura</th><th>Memoria</th><th>Parámetros</th><th>Largo plazo</th></tr>
+    <tr><td>RNN básica</td><td>Implícita</td><td>Baja</td><td>Limitada</td></tr>
+    <tr><td>LSTM</td><td>Explícita (estado c)</td><td>Alta</td><td>Alta</td></tr>
+    <tr><td>GRU</td><td>Parcial</td><td>Media</td><td>Media-Alta</td></tr>
+  </table>
+
+  <div class="alert"><strong>Limitación compartida:</strong> todas procesan el texto <em>token a token</em>, sin paralelización. En textos largos el entrenamiento es muy lento. Esta limitación motivó los Transformers.</div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="transformers" class="section-anchor">7. Transformers y LLMs</h2>
+
+  <h3>Mecanismo de atención</h3>
+  <p>La atención calcula, para cada token, cuánto debe "atender" a cada otro token de la secuencia. Tres vectores por token:</p>
+  <ul>
+    <li><strong>Query (Q):</strong> "¿qué busco?"</li>
+    <li><strong>Key (K):</strong> "¿qué soy?"</li>
+    <li><strong>Value (V):</strong> "¿qué aporto si se me elige?"</li>
+  </ul>
+  <div class="formula">Atención(Q, K, V) = softmax(Q·Kᵀ / √d_k) · V
+<span class="note">√d_k = factor de escala para estabilizar gradientes</span></div>
+
+  <h3>Vectores de posición</h3>
+  <p>A diferencia de las RNNs, el Transformer procesa todos los tokens <strong>en paralelo</strong>. Para que el modelo sepa el orden, se añade un <em>positional encoding</em> sinusoidal a cada embedding:</p>
+  <div class="formula">PE(pos, 2i)   = sin(pos / 10000^(2i/d_model))
+PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+<span class="note">pos = posición del token | i = índice de dimensión | d_model = dimensión del modelo</span></div>
+
+  <h3>Arquitectura Transformer (Encoder-Decoder)</h3>
+  <ul>
+    <li><strong>Encoder:</strong> procesa la entrada con self-attention multi-cabeza + FFN + residual + norma.</li>
+    <li><strong>Decoder:</strong> como el encoder, pero con self-attention enmascarada (no ve tokens futuros) y atención cruzada sobre la salida del encoder.</li>
+  </ul>
+
+  <table>
+    <tr><th>Propiedad</th><th>RNN</th><th>Transformer</th></tr>
+    <tr><td>Paralelismo</td><td>No (secuencial)</td><td>Sí (completo)</td></tr>
+    <tr><td>Dependencias largas</td><td>Limitadas</td><td>Altas</td></tr>
+    <tr><td>Complejidad por capa</td><td>O(n)</td><td>O(n²)</td></tr>
+    <tr><td>Gradiente</td><td>Variable</td><td>Estable con residual</td></tr>
+  </table>
+
+  <h3>Large Language Models (LLMs)</h3>
+  <p>Transformers preentrenados con millones/miles de millones de parámetros sobre grandes corpus. El objetivo de preentrenamiento autoregresivo es predecir el siguiente token:</p>
+  <div class="formula">P(x_{1:T}) = Π P(x_t | x_{&lt;t})    →    L = − Σ log P(x_t | x_{&lt;t})
+<span class="note">Primero se preentrenan con texto masivo; luego se ajustan finamente (fine-tuning) para tareas específicas</span></div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="subareas" class="section-anchor">8. Subareas del PLN</h2>
+
+  <table>
+    <tr><th>Subarea</th><th>Objetivo</th><th>Ejemplo de aplicación</th></tr>
+    <tr><td>Representación del lenguaje</td><td>Convertir texto en estructuras computables</td><td>Word embeddings, tokenización</td></tr>
+    <tr><td>Modelado del lenguaje</td><td>Predecir secuencias probables</td><td>GPT, autocompletado</td></tr>
+    <tr><td>Clasificación de texto</td><td>Asignar categorías a documentos</td><td>Detección de spam, análisis de noticias</td></tr>
+    <tr><td>Extracción de información</td><td>Identificar entidades y relaciones</td><td>NER, extracción de eventos</td></tr>
+    <tr><td>Recuperación de información</td><td>Encontrar documentos relevantes</td><td>Motores de búsqueda</td></tr>
+    <tr><td>Sistemas de diálogo</td><td>Mantener conversaciones naturales</td><td>Chatbots, asistentes virtuales</td></tr>
+    <tr><td>Análisis de sentimiento</td><td>Identificar opiniones y emociones</td><td>Reseñas de productos, monitoreo social</td></tr>
+    <tr><td>Resumen automático</td><td>Condensar textos largos</td><td>Resúmenes de noticias, informes</td></tr>
+    <tr><td>Traducción automática</td><td>Transformar texto entre idiomas</td><td>Google Translate, DeepL</td></tr>
+    <tr><td>Generación de texto</td><td>Producir contenido lingüístico nuevo</td><td>Redacción automática, asistentes IA</td></tr>
+  </table>
+
+  <div class="tags">
+    <span class="tag">Tokenización</span>
+    <span class="tag">TF-IDF</span>
+    <span class="tag">Word2Vec</span>
+    <span class="tag">GloVe</span>
+    <span class="tag">Naive Bayes</span>
+    <span class="tag">HMM</span>
+    <span class="tag">CRF</span>
+    <span class="tag">RNN</span>
+    <span class="tag">LSTM</span>
+    <span class="tag">GRU</span>
+    <span class="tag">Transformer</span>
+    <span class="tag">LLMs</span>
+    <span class="tag">NER</span>
+    <span class="tag">Análisis de sentimiento</span>
+  </div>
+
+</main>
+
+<div class="footer-nav">
+  <a href="cap1.html" class="prev">Cap. 1 — Visión</a>
+  <a href="cap3.html" class="next">Cap. 3 — Caso combinado</a>
+</div>
+
+</body>
+</html>

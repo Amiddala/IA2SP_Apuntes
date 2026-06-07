@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cap. 3 · Caso Combinado y Conclusiones</title>
+  <style>
+    :root{--bg:#0d0f14;--bg2:#12151c;--surface:#181c26;--border:#252a38;--text:#e2e6f0;--muted:#7a849a;--accent:#e88c5a;--accent-dim:#3d2210;--green:#38cfb4;--orange:#e88c5a;--red:#e05c6a;--blue:#5b7fff;--font-head:'Georgia','Times New Roman',serif;--font-body:'Segoe UI','Helvetica Neue',Arial,sans-serif;--font-mono:'Courier New',Courier,monospace;--max-w:800px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.8}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:.85rem 2rem;gap:1rem;flex-wrap:wrap}
+    .nav-back{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);transition:color .2s}
+    .nav-back:hover{color:var(--text);text-decoration:none}
+    .nav-back::before{content:'← '}
+    .nav-title{font-family:var(--font-head);font-size:.95rem;color:var(--text);flex:1;text-align:center}
+    .nav-home{display:inline-flex;align-items:center;font-size:.82rem;color:var(--muted);transition:color .2s}
+    .nav-home:hover{color:var(--text);text-decoration:none}
+    .ch-header{max-width:var(--max-w);margin:0 auto;padding:4rem 2rem 2.5rem}
+    .ch-tag{display:inline-block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-dim);background:rgba(232,140,90,.06);padding:.3rem .85rem;border-radius:99px;margin-bottom:1.2rem}
+    .ch-header h1{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.2rem);font-weight:400;letter-spacing:-.025em;line-height:1.2;margin-bottom:1rem}
+    .ch-header .lead{color:var(--muted);max-width:600px;font-size:1.05rem}
+    .ch-divider{max-width:var(--max-w);margin:2rem auto 0;border:none;border-top:1px solid var(--border)}
+    main{max-width:var(--max-w);margin:0 auto;padding:3rem 2rem 6rem}
+    .toc{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.5rem 1.8rem;margin-bottom:3.5rem}
+    .toc h4{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+    .toc ol{padding-left:1.2rem}
+    .toc li{font-size:.88rem;color:var(--muted);margin-bottom:.35rem}
+    .toc li a{color:var(--muted);transition:color .2s}
+    .toc li a:hover{color:var(--accent);text-decoration:none}
+    h2{font-family:var(--font-head);font-size:1.75rem;font-weight:400;letter-spacing:-.02em;margin:3.5rem 0 1rem;color:var(--text);padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+    h3{font-family:var(--font-head);font-size:1.2rem;font-weight:400;margin:2rem 0 .6rem;color:var(--text)}
+    h3::before{content:'// ';color:var(--accent);font-family:var(--font-mono);font-size:.9em}
+    p{margin-bottom:1rem;color:var(--text)}
+    ul,ol{padding-left:1.4rem;margin-bottom:1rem}
+    li{margin-bottom:.4rem;color:var(--muted)}
+    li strong{color:var(--text)}
+    .concept{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem 1.8rem;margin:1.5rem 0}
+    .concept-title{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+    .concept p{color:var(--muted);margin:0}
+    .formula{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:8px;padding:1rem 1.5rem;font-family:var(--font-mono);font-size:.88rem;color:var(--green);margin:1.2rem 0;overflow-x:auto;white-space:pre-wrap}
+    .formula .note{color:var(--muted);font-size:.78rem;display:block;margin-top:.4rem;font-family:var(--font-body)}
+    .alert{border-left:3px solid var(--orange);background:rgba(232,140,90,.06);border-radius:0 8px 8px 0;padding:1rem 1.4rem;margin:1.5rem 0;font-size:.92rem;color:var(--muted)}
+    .alert strong{color:var(--orange)}
+    .alert-blue{border-left:3px solid var(--blue);background:rgba(91,127,255,.05);border-radius:0 8px 8px 0;padding:1rem 1.4rem;margin:1.5rem 0;font-size:.92rem;color:var(--muted)}
+    .alert-blue strong{color:var(--blue)}
+    .alert-green{border-left:3px solid var(--green);background:rgba(56,207,180,.05);border-radius:0 8px 8px 0;padding:1rem 1.4rem;margin:1.5rem 0;font-size:.92rem;color:var(--muted)}
+    .alert-green strong{color:var(--green)}
+    .procon{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0}
+    @media(max-width:520px){.procon{grid-template-columns:1fr}}
+    .procon-box{border-radius:10px;padding:1.1rem 1.3rem}
+    .pros{background:rgba(56,207,180,.06);border:1px solid rgba(56,207,180,.2)}
+    .cons{background:rgba(224,92,106,.06);border:1px solid rgba(224,92,106,.2)}
+    .procon-box h5{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.7rem}
+    .pros h5{color:var(--green)}
+    .cons h5{color:var(--red)}
+    .procon-box ul{padding-left:1.1rem;margin:0}
+    .procon-box li{font-size:.85rem;margin-bottom:.3rem;color:var(--muted)}
+    .steps{counter-reset:step;list-style:none;padding:0;margin:1.2rem 0}
+    .steps li{counter-increment:step;display:flex;gap:1rem;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid var(--border);color:var(--text);font-size:.92rem}
+    .steps li:last-child{border-bottom:none}
+    .steps li::before{content:counter(step,decimal-leading-zero);font-family:var(--font-mono);font-size:.75rem;color:var(--accent);min-width:28px;padding-top:.1rem}
+    .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0}
+    .tag{font-size:.68rem;letter-spacing:.07em;padding:.22rem .65rem;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--bg2)}
+    .section-anchor{scroll-margin-top:70px}
+    .footer-nav{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding:2rem;max-width:var(--max-w);margin:0 auto;flex-wrap:wrap;gap:1rem}
+    .footer-nav a{font-size:.85rem;color:var(--muted);transition:color .2s}
+    .footer-nav a:hover{color:var(--text);text-decoration:none}
+    .footer-nav .prev::before{content:'← '}
+    .footer-nav .next::after{content:' →'}
+    table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.88rem}
+    th{background:var(--surface);color:var(--accent);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1rem;text-align:left;border-bottom:2px solid var(--border)}
+    td{padding:.6rem 1rem;border-bottom:1px solid var(--border);color:var(--muted)}
+    tr:last-child td{border-bottom:none}
+    .pipeline-flow{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.5rem 0;align-items:center}
+    .pf-step{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem 1.1rem;font-size:.85rem;color:var(--text);white-space:nowrap}
+    .pf-arrow{color:var(--muted);font-size:1rem;flex-shrink:0}
+    .metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;margin:1.2rem 0}
+    .metric-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.2rem;text-align:center}
+    .metric-card .metric-val{font-family:var(--font-head);font-size:1.8rem;font-weight:400;margin-bottom:.3rem}
+    .metric-card .metric-label{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .m1 .metric-val{color:var(--blue)}
+    .m2 .metric-val{color:var(--green)}
+    .m3 .metric-val{color:var(--orange)}
+    .comparison-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin:.8rem 0}
+    .comparison-card h4{font-family:var(--font-head);font-size:1rem;font-weight:400;margin-bottom:.8rem;color:var(--text)}
+    .comparison-card .domain{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="cap2.html" class="nav-back">Cap. 2</a>
+  <span class="nav-title">Cap. 3 · Caso Combinado &amp; Conclusiones</span>
+  <a href="index.html" class="nav-home">Índice</a>
+</nav>
+
+<div class="ch-header">
+  <span class="ch-tag">Capítulo 03</span>
+  <h1>Caso Combinado &amp; Conclusiones</h1>
+  <p class="lead">Análisis de sentimiento como pipeline completo de PLN, comparativa de paradigmas clásicos vs. modernos, y los nexos entre Visión por Computadora y Lenguaje Natural.</p>
+</div>
+<hr class="ch-divider" />
+
+<main>
+
+  <nav class="toc">
+    <h4>Contenido</h4>
+    <ol>
+      <li><a href="#sentimiento">1. Análisis de sentimiento — ejemplo completo</a></li>
+      <li><a href="#preprocesado">2. Preprocesado y representación</a></li>
+      <li><a href="#clasificacion">3. Modelo de clasificación y evaluación</a></li>
+      <li><a href="#comparativa">4. Comparativa de paradigmas</a></li>
+      <li><a href="#nexos">5. Nexos entre Visión y PLN</a></li>
+      <li><a href="#conclusiones">6. Conclusiones</a></li>
+    </ol>
+  </nav>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="sentimiento" class="section-anchor">1. Análisis de sentimiento — ejemplo completo</h2>
+
+  <p>El <strong>análisis de sentimiento</strong> es una tarea de PLN que determina la opinión o emoción expresada en un texto. Es uno de los mejores ejemplos para ilustrar el flujo completo de un sistema de PLN, desde el texto crudo hasta una clasificación útil.</p>
+
+  <div class="concept">
+    <div class="concept-title">Objetivo del sistema</div>
+    <p>Dado un comentario de texto, clasificarlo en: <strong>Positivo</strong> | <strong>Negativo</strong> | <strong>Neutro</strong>. Por ejemplo: "la plataforma funciona muy bien y es fácil de usar" → Positivo.</p>
+  </div>
+
+  <h3>El pipeline completo</h3>
+  <div class="pipeline-flow">
+    <div class="pf-step">📝 Texto crudo</div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-step">🔧 Preprocesado</div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-step">🔢 Representación</div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-step">🤖 Modelo</div>
+    <div class="pf-arrow">→</div>
+    <div class="pf-step">✅ Clasificación</div>
+  </div>
+
+  <p>Cada etapa transforma el texto en una representación más abstracta que el modelo puede procesar. Un error en etapas tempranas degrada el rendimiento en todas las siguientes.</p>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="preprocesado" class="section-anchor">2. Preprocesado y representación</h2>
+
+  <h3>Tokenización y limpieza</h3>
+  <p>La tokenización divide la oración en unidades (tokens). Además se normalizan caracteres y se eliminan elementos irrelevantes:</p>
+  <div class="formula">"la clase fue EXCELENTE!!!"
+    ↓  tokenizar + normalizar
+["la", "clase", "fue", "excelente"]
+<span class="note">Se eliminan mayúsculas, puntuación excesiva y caracteres especiales</span></div>
+
+  <div class="alert-blue"><strong>Importancia del preprocesado:</strong> un modelo entrenado con texto ruidoso aprende patrones incorrectos. Limpiar los datos es tan importante como la arquitectura del modelo.</div>
+
+  <h3>Representación vectorial mediante embeddings</h3>
+  <p>Las computadoras no entienden palabras directamente; necesitan números. Cada token se convierte en un vector numérico donde palabras semánticamente similares tienen vectores próximos:</p>
+  <div class="formula">"excelente"  →  (0.82, 0.11, 0.65, …)
+"muy bueno"  →  (0.79, 0.14, 0.63, …)   ← vectores cercanos
+"terrible"   →  (0.05, 0.91, 0.12, …)   ← vector lejano
+<span class="note">La distancia entre vectores captura similitud semántica</span></div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="clasificacion" class="section-anchor">3. Modelo de clasificación y evaluación</h2>
+
+  <h3>Función Softmax para clasificación multiclase</h3>
+  <p>Una vez representado el texto como vector z_d, el clasificador calcula la probabilidad de cada clase con la función softmax:</p>
+  <div class="formula">P(y = k | d) = exp(wₖᵀ · z_d) / Σⱼ exp(wⱼᵀ · z_d)
+<span class="note">wₖ = parámetros de la clase k | z_d = representación del documento</span></div>
+
+  <h3>Ejemplo de salida del clasificador</h3>
+  <p>Para el texto "el servicio fue lento y frustrante":</p>
+  <table>
+    <tr><th>Clase</th><th>Probabilidad</th><th>Decisión</th></tr>
+    <tr><td>Positivo</td><td>0.05</td><td></td></tr>
+    <tr><td>Neutro</td><td>0.10</td><td></td></tr>
+    <tr><td>Negativo</td><td>0.85</td><td>← Clase elegida</td></tr>
+  </table>
+
+  <h3>Comprensión de contexto</h3>
+  <p>Los modelos modernos no solo miran palabras aisladas; entienden que el sentimiento global puede contradecir palabras individuales positivas:</p>
+  <div class="alert"><strong>Ejemplo de contexto:</strong> "la clase parecía buena pero el examen fue terrible" → el modelo debe entender que "terrible" domina el sentimiento global sobre "buena".</div>
+
+  <h3>Métricas de evaluación</h3>
+  <p>Tras entrenar el modelo se mide su calidad con datos de prueba nunca vistos:</p>
+
+  <div class="metric-grid">
+    <div class="metric-card m1">
+      <div class="metric-val">TP/(TP+FP)</div>
+      <div class="metric-label">Precisión</div>
+    </div>
+    <div class="metric-card m2">
+      <div class="metric-val">TP/(TP+FN)</div>
+      <div class="metric-label">Recall</div>
+    </div>
+    <div class="metric-card m3">
+      <div class="metric-val">2·P·R/(P+R)</div>
+      <div class="metric-label">F1-Score</div>
+    </div>
+  </div>
+
+  <ul>
+    <li><strong>Precisión:</strong> de todos los positivos predichos, ¿cuántos eran realmente positivos?</li>
+    <li><strong>Recall:</strong> de todos los positivos reales, ¿cuántos detectó el modelo?</li>
+    <li><strong>F1-Score:</strong> media armónica de precisión y recall; equilibra ambas métricas.</li>
+  </ul>
+
+  <h3>Flujo operativo en producción</h3>
+  <ol class="steps">
+    <li><strong>Entrenamiento:</strong> el modelo aprende patrones con datos etiquetados.</li>
+    <li><strong>Validación:</strong> se ajustan hiperparámetros con datos de validación separados.</li>
+    <li><strong>Despliegue:</strong> el modelo analiza nuevos comentarios en tiempo real.</li>
+    <li><strong>Monitoreo y re-entrenamiento:</strong> el rendimiento se vigila; si cae, se re-entrena con datos nuevos.</li>
+  </ol>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="comparativa" class="section-anchor">4. Comparativa de paradigmas</h2>
+
+  <p>La evolución de ambas disciplinas (Visión y PLN) sigue una trayectoria similar: de reglas manuales, a estadística, a Deep Learning.</p>
+
+  <h3>Evolución del PLN</h3>
+  <table>
+    <tr><th>Era</th><th>Representación</th><th>Modelos</th><th>Características</th></tr>
+    <tr><td>Clásica</td><td>BoW, TF-IDF</td><td>Naive Bayes, SVM</td><td>Rápidos, interpretables, no capturan semántica</td></tr>
+    <tr><td>Embeddings</td><td>Word2Vec, GloVe</td><td>RNN, LSTM, GRU</td><td>Semántica densa, pero secuenciales</td></tr>
+    <tr><td>Moderna</td><td>Contextuales (BERT, GPT)</td><td>Transformers, LLMs</td><td>Estado del arte, costosos en recursos</td></tr>
+  </table>
+
+  <h3>Evolución de la Visión por Computadora</h3>
+  <table>
+    <tr><th>Era</th><th>Representación</th><th>Modelos</th><th>Características</th></tr>
+    <tr><td>Clásica</td><td>Filtros manuales, SIFT, HOG</td><td>SVM, k-NN</td><td>Interpretables, robustos, ingeniería manual</td></tr>
+    <tr><td>Deep Learning</td><td>Características aprendidas</td><td>CNN (AlexNet, VGG, ResNet)</td><td>Alta precisión, requieren muchos datos</td></tr>
+    <tr><td>Moderna</td><td>Patches como tokens</td><td>Vision Transformers (ViT)</td><td>Unifica arquitectura con PLN</td></tr>
+  </table>
+
+  <div class="alert-green"><strong>Convergencia arquitectónica:</strong> los Vision Transformers (ViT) demuestran que la misma arquitectura Transformer que domina el PLN puede aplicarse directamente a imágenes divididas en "patches", unificando ambas disciplinas bajo un mismo paradigma.</div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="nexos" class="section-anchor">5. Nexos entre Visión y PLN</h2>
+
+  <div class="comparison-card">
+    <div class="domain">Visión por Computadora</div>
+    <h4>Convolución 2D (Filtros)</h4>
+    <p style="color:var(--muted);font-size:.9rem">El kernel se desliza sobre la imagen calculando sumas ponderadas locales para detectar patrones espaciales (bordes, texturas).</p>
+  </div>
+
+  <div class="comparison-card">
+    <div class="domain">Procesamiento de Lenguaje Natural</div>
+    <h4>Mecanismo de Atención</h4>
+    <p style="color:var(--muted);font-size:.9rem">Para cada token, calcula sumas ponderadas sobre toda la secuencia para capturar dependencias semánticas arbitrariamente lejanas.</p>
+  </div>
+
+  <p>Ambos son mecanismos de <strong>agregación ponderada</strong>, pero con alcance diferente: la convolución es local (vecindad del píxel), mientras que la atención es global (toda la secuencia).</p>
+
+  <h3>Tareas multimodales que combinan ambas disciplinas</h3>
+  <table>
+    <tr><th>Tarea</th><th>Visión</th><th>PLN</th></tr>
+    <tr><td>Generación de pies de foto</td><td>Extrae características visuales</td><td>Genera descripción textual</td></tr>
+    <tr><td>Respuesta a preguntas visuales (VQA)</td><td>Entiende la imagen</td><td>Procesa la pregunta y genera respuesta</td></tr>
+    <tr><td>Búsqueda de imágenes por texto</td><td>Codifica imágenes</td><td>Codifica consulta textual</td></tr>
+    <tr><td>OCR y comprensión de documentos</td><td>Detecta texto en imágenes</td><td>Interpreta contenido</td></tr>
+  </table>
+
+  <div class="alert-blue"><strong>CLIP y DALL-E:</strong> modelos modernos como CLIP (OpenAI) aprenden un espacio de representación compartido entre imágenes y texto, permitiendo buscar imágenes con descripciones en lenguaje natural. Esto es la culminación práctica de la convergencia entre ambas disciplinas.</div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="conclusiones" class="section-anchor">6. Conclusiones</h2>
+
+  <h3>Lecciones fundamentales de Visión por Computadora</h3>
+  <ul>
+    <li>Una imagen es una matriz de números; entender su representación matemática es el punto de partida.</li>
+    <li>Los filtros (Gaussiano, Sobel, Canny) son operaciones matemáticas simples pero poderosas para extraer información.</li>
+    <li>Los descriptores (SIFT, ORB) resuelven el problema de comparar regiones entre imágenes distintas con invarianza a transformaciones.</li>
+    <li>La calibración y la geometría epipolar son puentes entre las coordenadas 2D de la imagen y el mundo 3D real.</li>
+    <li>Los clasificadores clásicos (SVM, k-NN) funcionan bien cuando las características son bien elegidas; las CNNs las aprenden automáticamente.</li>
+  </ul>
+
+  <h3>Lecciones fundamentales de PLN</h3>
+  <ul>
+    <li>El lenguaje es ambiguo, variable y dependiente del contexto; no hay solución perfecta, solo mejores aproximaciones.</li>
+    <li>La representación del texto es crucial: BoW ignora semántica; los embeddings la capturan; los modelos contextuales la maximizan.</li>
+    <li>La progresión Naive Bayes → HMM → CRF refleja la relajación progresiva de supuestos de independencia.</li>
+    <li>LSTM y GRU resuelven el olvido de las RNNs, pero siguen siendo secuenciales.</li>
+    <li>Los Transformers paralelizaron el procesamiento y desbloquearon los LLMs modernos.</li>
+  </ul>
+
+  <h3>El paradigma que domina hoy</h3>
+  <div class="procon">
+    <div class="procon-box pros">
+      <h5>Métodos modernos (Deep Learning)</h5>
+      <ul>
+        <li>Aprenden representaciones automáticamente</li>
+        <li>Estado del arte en casi todas las tareas</li>
+        <li>Un solo modelo para muchas tareas (LLMs)</li>
+        <li>Mejoran con más datos y cómputo</li>
+      </ul>
+    </div>
+    <div class="procon-box cons">
+      <h5>Métodos clásicos (aún relevantes)</h5>
+      <ul>
+        <li>Interpretables y auditables</li>
+        <li>Funcionan con pocos datos</li>
+        <li>Bajo costo computacional</li>
+        <li>Necesarios en sistemas embebidos y robótica</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert-green"><strong>Reflexión final:</strong> comprender los métodos clásicos no es obsoleto. Son la base conceptual sobre la que se construyeron las arquitecturas modernas, y siguen siendo la herramienta correcta cuando los recursos son limitados o la interpretabilidad es un requisito no negociable.</div>
+
+  <div class="tags">
+    <span class="tag">Análisis de sentimiento</span>
+    <span class="tag">Pipeline PLN</span>
+    <span class="tag">Softmax</span>
+    <span class="tag">F1-Score</span>
+    <span class="tag">Vision Transformers</span>
+    <span class="tag">Multimodal</span>
+    <span class="tag">CLIP</span>
+    <span class="tag">Convergencia IA</span>
+  </div>
+
+</main>
+
+<div class="footer-nav">
+  <a href="cap2.html" class="prev">Cap. 2 — PLN</a>
+  <a href="index.html" class="next">Volver al índice</a>
+</div>
+
+</body>
+</html>
