@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Algoritmos Genéticos — Apuntes de Estudio</title>
+  <style>
+    :root{
+      --bg:#08111f;
+      --panel:#111827;
+      --card:#1f2937;
+      --soft:#334155;
+      --text:#e5e7eb;
+      --muted:#cbd5e1;
+      --accent:#60a5fa;
+      --accent-2:#34d399;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --border:rgba(255,255,255,.08);
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:20px;
+      --max:1140px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(52,211,153,.10), transparent 35%),
+        linear-gradient(180deg, #07101d 0%, #0f172a 100%);
+      color:var(--text);
+      line-height:1.72;
+    }
+
+    a{color:inherit; text-decoration:none}
+    .wrap{
+      width:min(var(--max), calc(100% - 32px));
+      margin:0 auto;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      backdrop-filter: blur(14px);
+      background: rgba(15,23,42,.78);
+      border-bottom:1px solid var(--border);
+    }
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 0;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .brand-badge{
+      width:40px;height:40px;border-radius:14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow);
+    }
+    nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    nav a{
+      padding:10px 14px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:.95rem;
+      transition:.2s ease;
+    }
+    nav a:hover{
+      transform:translateY(-1px);
+      border-color:rgba(96,165,250,.45);
+      color:white;
+      background:rgba(96,165,250,.10);
+    }
+
+    .hero{
+      padding:42px 0 18px;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.35fr .85fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    .hero-card, .panel, .qa-card{
+      background: rgba(17,24,39,.88);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-card{
+      padding:28px;
+    }
+    h1{
+      margin:0 0 12px;
+      line-height:1.08;
+      font-size: clamp(2rem, 4vw, 3.35rem);
+    }
+    .lead{
+      color:var(--muted);
+      font-size:1.03rem;
+      margin:0 0 18px;
+      max-width:72ch;
+    }
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+    .pill{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:.92rem;
+    }
+    .side-card{
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:space-between;
+    }
+    .side-card h2{
+      margin:0;
+      font-size:1.15rem;
+    }
+    .side-card p{
+      margin:0;
+      color:var(--muted);
+    }
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .stat{
+      padding:14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--border);
+    }
+    .stat strong{
+      display:block;
+      font-size:1.4rem;
+      color:white;
+      margin-bottom:4px;
+    }
+    .stat span{color:var(--muted); font-size:.9rem}
+
+    main{padding:10px 0 60px}
+    section{
+      margin-top:22px;
+      scroll-margin-top:88px;
+    }
+    .section-title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin:0 0 12px;
+      flex-wrap:wrap;
+    }
+    h2{
+      margin:0;
+      font-size:1.55rem;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin:0;
+      font-size:.95rem;
+    }
+    .panel{
+      padding:24px;
+    }
+    h3{
+      margin:20px 0 8px;
+      font-size:1.12rem;
+    }
+    p{margin:0 0 12px}
+    ul, ol{margin:10px 0 14px 22px}
+    li{margin:6px 0}
+    .callout{
+      margin:16px 0;
+      padding:16px 16px 16px 18px;
+      border-left:4px solid var(--accent);
+      background:rgba(96,165,250,.08);
+      border-radius:14px;
+      color:var(--text);
+    }
+    .callout.alt{border-left-color: var(--accent-2); background: rgba(52,211,153,.08)}
+    .callout.warn{border-left-color: var(--warn); background: rgba(251,191,36,.08)}
+    .callout.danger{border-left-color: var(--danger); background: rgba(251,113,133,.08)}
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .mini{
+      padding:16px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:rgba(255,255,255,.03);
+    }
+    .mini strong{
+      display:block;
+      margin-bottom:6px;
+      color:#fff;
+    }
+    .mini span{color:var(--muted)}
+    .nav-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+    .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      transition:.2s ease;
+    }
+    .button:hover{
+      transform:translateY(-1px);
+      border-color:rgba(96,165,250,.45);
+      background:rgba(96,165,250,.09);
+    }
+    .qa-grid{
+      display:grid;
+      gap:14px;
+      margin-top:14px;
+    }
+    .qa-card{
+      padding:18px;
+    }
+    .qa-card h3{
+      margin-top:0;
+      font-size:1.02rem;
+    }
+    .options{
+      list-style:none;
+      padding:0;
+      margin:12px 0 0;
+      display:grid;
+      gap:8px;
+    }
+    .options li{
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      margin:0;
+    }
+    .answer{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(52,211,153,.35);
+      background:rgba(52,211,153,.08);
+      color:#dcfce7;
+    }
+    .footer{
+      padding:30px 0 44px;
+      color:var(--muted);
+      text-align:center;
+      font-size:.95rem;
+    }
+
+    @media (max-width: 900px){
+      .hero-grid{grid-template-columns:1fr}
+      .mini-grid{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(var(--max), calc(100% - 22px))}
+      .hero-card, .panel, .qa-card{padding:18px}
+      .topbar-inner{padding:12px 0}
+      nav a{padding:9px 11px; font-size:.9rem}
+      h2{font-size:1.3rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true"></div>
+        <div>
+          <div>Algoritmos Genéticos</div>
+          <small style="color:var(--muted)">Apuntes de estudio basados solo en tu PDF</small>
+        </div>
+      </div>
+      <nav aria-label="Navegación">
+        <a href="#introduccion">Introducción</a>
+        <a href="#bases">Bases biológicas</a>
+        <a href="#representacion">Representación</a>
+        <a href="#operadores">Operadores</a>
+        <a href="#teoria">Teoría</a>
+        <a href="#preguntas">Preguntas</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <article class="hero-card">
+        <h1>Algoritmos Genéticos: teoría clara para repasar antes del examen</h1>
+        <p class="lead">
+          Este HTML condensa y desarrolla el PDF de Algoritmos Genéticos con un estilo de estudio más completo:
+          explica la idea evolutiva, la función de aptitud, la representación de soluciones, los operadores genéticos,
+          la dinámica evolutiva, la convergencia prematura, y por qué estos algoritmos funcionan.
+        </p>
+        <div class="callout">
+          La idea central es evolucionar una población de soluciones hasta acercarse a una respuesta de alta calidad,
+          usando selección, cruce y mutación.
+        </div>
+        <div class="pill-row">
+          <span class="pill">Población</span>
+          <span class="pill">Fitness</span>
+          <span class="pill">Selección</span>
+          <span class="pill">Cruce</span>
+          <span class="pill">Mutación</span>
+          <span class="pill">Elitismo</span>
+        </div>
+      </article>
+
+      <aside class="hero-card side-card">
+        <div>
+          <h2>Lo que debes recordar</h2>
+          <p>Un AG no trabaja con una sola solución, sino con muchas soluciones que compiten y evolucionan.</p>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <strong>3</strong>
+            <span>operadores clave</span>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <span>función de aptitud</span>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <span>ciclo generacional</span>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <span>idea evolutiva</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section id="introduccion">
+      <div class="section-title">
+        <h2>1. Introducción</h2>
+        <p class="subtitle">Qué son y por qué se usan</p>
+      </div>
+      <article class="panel">
+        <p>
+          Los Algoritmos Genéticos son métodos de búsqueda y optimización inspirados en la evolución biológica.
+          El PDF explica que surgen a partir de la teoría de Darwin y de los principios de la genética de Mendel.
+          Su objetivo no es probar una única solución, sino trabajar con una población de posibles soluciones que
+          va cambiando generación tras generación.
+        </p>
+        <p>
+          Esta forma de resolver problemas es útil cuando el espacio de búsqueda es muy grande y no conviene revisar
+          todas las alternativas una por una. En lugar de eso, el algoritmo conserva las soluciones más prometedoras,
+          combina sus características y mantiene pequeñas variaciones para seguir explorando.
+        </p>
+
+        <div class="callout alt">
+          Idea simple para memorizar: los mejores individuos tienen más oportunidades de dejar descendencia, pero los menos aptos no desaparecen de inmediato.
+        </div>
+
+        <h3>Qué problema resuelven</h3>
+        <ul>
+          <li>Problemas de optimización complejos.</li>
+          <li>Situaciones donde hay muchas soluciones posibles.</li>
+          <li>Casos donde una búsqueda exhaustiva sería demasiado costosa.</li>
+          <li>Problemas donde interesa acercarse a una solución muy buena aunque no siempre perfecta.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="bases">
+      <div class="section-title">
+        <h2>2. Fundamentos biológicos</h2>
+        <p class="subtitle">La base evolutiva que inspira el algoritmo</p>
+      </div>
+      <article class="panel">
+        <h3>2.1 Aporte de Darwin</h3>
+        <p>
+          El PDF presenta la evolución por selección natural como el punto de partida conceptual de los AG.
+          Darwin propuso que las especies cambian con el tiempo y que los individuos mejor adaptados al entorno
+          tienen mayor probabilidad de sobrevivir y reproducirse.
+        </p>
+        <p>
+          De esta idea salen cuatro conceptos que luego se trasladan al mundo computacional: variabilidad,
+          herencia, selección natural y adaptación. En un algoritmo genético, esas ideas se reinterpretan como
+          diversidad de soluciones, transmisión de información útil, preferencia por los mejores individuos y mejora
+          progresiva de la población.
+        </p>
+
+        <h3>2.2 Aporte de Mendel</h3>
+        <p>
+          Mendel explicó cómo se transmiten las características mediante genes, alelos y cromosomas.
+          En los algoritmos genéticos, esa visión sirve para representar las soluciones como cromosomas,
+          y cada parte del cromosoma como un gen que describe una característica particular de la solución.
+        </p>
+
+        <div class="mini-grid">
+          <div class="mini">
+            <strong>Variabilidad</strong>
+            <span>Las soluciones no son idénticas; existen diferencias entre ellas.</span>
+          </div>
+          <div class="mini">
+            <strong>Herencia</strong>
+            <span>Las buenas características pueden pasar a la siguiente generación.</span>
+          </div>
+          <div class="mini">
+            <strong>Selección</strong>
+            <span>Las mejores soluciones tienen más posibilidades de reproducirse.</span>
+          </div>
+          <div class="mini">
+            <strong>Mutación</strong>
+            <span>Aparecen pequeños cambios que aportan novedad y diversidad.</span>
+          </div>
+        </div>
+
+        <h3>2.3 Por qué esto sirve en computación</h3>
+        <p>
+          El algoritmo no copia la biología de forma literal. Toma la lógica de la evolución como metáfora para construir un método de búsqueda:
+          probar muchas alternativas, evaluar su calidad, conservar las mejores y seguir variando lo necesario para no estancarse.
+        </p>
+      </article>
+    </section>
+
+    <section id="representacion">
+      <div class="section-title">
+        <h2>3. Representación de soluciones</h2>
+        <p class="subtitle">Cómo se codifica una respuesta para poder manipularla</p>
+      </div>
+      <article class="panel">
+        <p>
+          Para que un algoritmo genético funcione, primero hay que decidir cómo representar una solución. El PDF insiste en que no existe una
+          representación universal: la elección depende del problema, de la forma en que se pueda codificar la respuesta y de cómo se vayan a
+          aplicar el cruce y la mutación.
+        </p>
+
+        <h3>3.1 El cromosoma como estructura de datos</h3>
+        <p>
+          Cada solución se ve como un cromosoma. Cada gen representa una parte de la solución. Esa codificación puede estar formada por bits,
+          enteros, valores reales, permutaciones, árboles o mezclas de varias estructuras.
+        </p>
+
+        <h3>3.2 Tipos de representación</h3>
+        <ul>
+          <li><strong>Binaria:</strong> usa cadenas de 0 y 1. Es simple y muy usada cuando la solución se puede expresar de esa forma.</li>
+          <li><strong>Entera:</strong> usa secuencias de números enteros. Sirve cuando cada gen representa un índice o un valor discreto.</li>
+          <li><strong>Real:</strong> usa números con decimales. Es útil para variables continuas.</li>
+          <li><strong>Permutación:</strong> representa órdenes o recorridos. Es fundamental cuando importa la secuencia de los elementos.</li>
+          <li><strong>Árbol:</strong> representa jerarquías o expresiones estructuradas.</li>
+          <li><strong>Híbrida:</strong> combina varios tipos de representación dentro del mismo cromosoma.</li>
+        </ul>
+
+        <h3>3.3 El problema del agente viajero</h3>
+        <p>
+          El documento usa este problema como ejemplo clásico de representación por permutaciones. La idea es encontrar una ruta de costo mínimo
+          que visite todas las ciudades una sola vez y regrese al inicio. Aquí el orden sí importa, por eso no basta con una lista cualquiera:
+          hay que preservar una secuencia válida.
+        </p>
+
+        <div class="callout warn">
+          La representación afecta el rendimiento: una mala codificación puede producir descendientes inválidos o hacer más difícil la convergencia.
+        </div>
+
+        <h3>3.4 Impacto de elegir bien la representación</h3>
+        <ul>
+          <li>Puede acelerar o frenar la búsqueda.</li>
+          <li>Influye en la facilidad para aplicar cruce y mutación.</li>
+          <li>Determina si aparecen o no soluciones válidas después de cada operador.</li>
+          <li>También afecta la diversidad y el riesgo de convergencia prematura.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="operadores">
+      <div class="section-title">
+        <h2>4. Operadores genéticos</h2>
+        <p class="subtitle">Las herramientas que hacen evolucionar la población</p>
+      </div>
+      <article class="panel">
+        <h3>4.1 Población inicial y tamaño de población</h3>
+        <p>
+          El algoritmo empieza con una población de individuos. Esa primera población puede crearse al azar, usando heurísticas o combinando ambas
+          estrategias. El PDF resalta que el tamaño de la población influye en la diversidad y en el costo computacional.
+        </p>
+        <p>
+          Una población pequeña consume menos recursos pero explora menos el espacio de búsqueda. Una población grande ofrece más variedad,
+          pero también requiere más tiempo y más procesamiento.
+        </p>
+
+        <h3>4.2 Selección</h3>
+        <p>
+          La selección decide qué individuos se reproducen. Los más aptos tienen más probabilidad de ser elegidos, pero la aleatoriedad también se
+          conserva para evitar quedar atrapados en óptimos locales.
+        </p>
+        <ul>
+          <li><strong>Ruleta:</strong> cada individuo ocupa una porción proporcional a su adaptación.</li>
+          <li><strong>Torneo:</strong> se enfrentan unos pocos individuos y gana el mejor del grupo.</li>
+          <li><strong>Ranking:</strong> importa el orden relativo, no solo el valor exacto.</li>
+          <li><strong>Elitismo:</strong> los mejores individuos pasan intactos a la siguiente generación.</li>
+        </ul>
+
+        <h3>4.3 Cruce o recombinación</h3>
+        <p>
+          El cruce combina partes de dos padres para generar hijos. El PDF menciona cruce de un punto, de dos puntos, uniforme y variantes
+          para permutaciones como PMX y OX. La idea común es mezclar información útil de distintas soluciones para producir descendencia
+          potencialmente mejor.
+        </p>
+        <p>
+          Una tasa de cruce alta favorece la recombinación de características, pero no siempre debe aplicarse siempre: a veces dos padres no se cruzan
+          y pasan directamente a la siguiente generación.
+        </p>
+
+        <h3>4.4 Mutación</h3>
+        <p>
+          La mutación introduce cambios pequeños y aleatorios. Su función principal es mantener la diversidad y evitar que toda la población se vuelva
+          demasiado parecida. El PDF presenta mutación de bit, uniforme, gaussiana, intercambio, inserción e inversión.
+        </p>
+        <p>
+          La mutación debe ser baja: si es demasiado grande, el algoritmo pierde estabilidad; si es demasiado pequeña, la población puede quedarse sin
+          diversidad suficiente para seguir mejorando.
+        </p>
+
+        <h3>4.5 Reemplazo y parada</h3>
+        <p>
+          Tras crear descendencia, el algoritmo decide qué individuos continúan en la siguiente generación. Puede usar reemplazo generacional puro,
+          estacionario, elitista o basado en torneo. Luego, el proceso termina según criterios como número máximo de generaciones, tiempo límite,
+          estancamiento o alcance de una calidad suficiente.
+        </p>
+
+        <div class="callout">
+          Selección, cruce y mutación no son pasos aislados: forman un ciclo que se repite una y otra vez para refinar la población.
+        </div>
+      </article>
+    </section>
+
+    <section id="dinamica">
+      <div class="section-title">
+        <h2>5. Dinámica evolutiva</h2>
+        <p class="subtitle">Cómo se comporta el algoritmo a lo largo de las generaciones</p>
+      </div>
+      <article class="panel">
+        <p>
+          La dinámica evolutiva describe cómo cambia la población con el paso del tiempo. Cada generación está formada por individuos evaluados,
+          seleccionados, cruzados y mutados. Con este ciclo se espera que la población mejore gradualmente.
+        </p>
+
+        <h3>5.1 Ciclo generacional completo</h3>
+        <ol>
+          <li>Se crea la población inicial.</li>
+          <li>Se evalúa a cada individuo con la función de aptitud.</li>
+          <li>Se eligen los padres con mayor probabilidad.</li>
+          <li>Se generan hijos con cruce y mutación.</li>
+          <li>Se reemplaza la población anterior por la nueva.</li>
+          <li>Se repite el proceso hasta el criterio de parada.</li>
+        </ol>
+
+        <h3>5.2 Ejemplo conceptual del proceso</h3>
+        <p>
+          El PDF muestra un ejemplo donde el algoritmo busca el máximo de una función en un intervalo dado. Primero se discretiza el espacio,
+          luego se codifican soluciones en binario, se evalúa la población, se seleccionan los mejores individuos y se generan nuevas cadenas
+          por cruce y mutación. Al final, la población mejora y se acerca a la mejor solución encontrada.
+        </p>
+
+        <h3>5.3 Convergencia prematura</h3>
+        <p>
+          Uno de los riesgos más importantes es que la población pierda diversidad demasiado pronto. Si esto ocurre, el algoritmo deja de explorar
+          el espacio de búsqueda y se queda atrapado antes de llegar al óptimo global.
+        </p>
+        <p>
+          El problema suele aparecer cuando la presión selectiva es demasiado alta o cuando la representación y los operadores reducen demasiado
+          la variedad. En ese caso, los individuos se parecen mucho entre sí y el algoritmo prácticamente deja de avanzar.
+        </p>
+
+        <h3>5.4 Cómo mantener la diversidad</h3>
+        <ul>
+          <li>Usar escalados de aptitud.</li>
+          <li>Evitar una presión selectiva exagerada.</li>
+          <li>Conservar una mutación pequeña pero no nula.</li>
+          <li>Elegir bien el tamaño de la población.</li>
+          <li>Aplicar elitismo con cuidado para no congelar la evolución.</li>
+        </ul>
+
+        <div class="callout danger">
+          Un algoritmo genético con poca diversidad puede parecer que “aprende”, pero en realidad solo se repite y se estanca.
+        </div>
+      </article>
+    </section>
+
+    <section id="teoria">
+      <div class="section-title">
+        <h2>6. ¿Por qué funcionan?</h2>
+        <p class="subtitle">La base teórica que justifica su comportamiento</p>
+      </div>
+      <article class="panel">
+        <p>
+          El PDF deja claro que los algoritmos genéticos no son búsquedas aleatorias. Tienen una base teórica que explica por qué pueden encontrar
+          buenas soluciones en espacios enormes. Esa base se apoya en los esquemas, el teorema de los esquemas, la hipótesis de bloques y
+          los teoremas de convergencia.
+        </p>
+
+        <h3>6.1 Esquemas</h3>
+        <p>
+          Un esquema es una plantilla que agrupa cromosomas que comparten ciertos genes en posiciones concretas. Sirve para hablar de patrones
+          parciales dentro de la población.
+        </p>
+        <p>
+          El PDF explica que un esquema puede verse como una combinación de posiciones fijas y posiciones “comodín”. Los esquemas de orden bajo
+          y longitud compacta suelen sobrevivir mejor que los esquemas más largos y específicos.
+        </p>
+
+        <h3>6.2 Teorema de los esquemas</h3>
+        <p>
+          La idea central del teorema es que los esquemas cortos, de bajo orden y con aptitud superior al promedio tienden a multiplicarse
+          a lo largo de las generaciones. Dicho de manera simple: las buenas piezas de información sobreviven y se expanden.
+        </p>
+
+        <h3>6.3 Hipótesis de bloques constructivos</h3>
+        <p>
+          Según esta hipótesis, el algoritmo no resuelve el problema completo de una sola vez. Primero detecta pequeños fragmentos buenos de solución,
+          llamados bloques constructivos, y luego los combina para formar soluciones cada vez mejores.
+        </p>
+        <p>
+          Es una visión muy intuitiva: el cruce no solo mezcla al azar, sino que transfiere fragmentos que ya demostraron funcionar bien.
+        </p>
+
+        <h3>6.4 Teoremas de convergencia</h3>
+        <p>
+          El PDF señala que sin elitismo no existe garantía de conservar la mejor solución encontrada. Si un buen individuo se modifica o se pierde,
+          el algoritmo podría no recuperarlo. En cambio, con elitismo y una mutación mayor que cero, existe una garantía teórica de convergencia
+          al óptimo global en términos probabilísticos.
+        </p>
+
+        <div class="callout alt">
+          En resumen: los AG funcionan porque conservan lo bueno, combinan lo útil y siguen explorando con pequeñas variaciones.
+        </div>
+      </article>
+    </section>
+
+    <section id="conclusion">
+      <div class="section-title">
+        <h2>7. Conclusión y repaso rápido</h2>
+        <p class="subtitle">Lo esencial para memorizar</p>
+      </div>
+      <article class="panel">
+        <p>
+          Los algoritmos genéticos son una herramienta eficaz para resolver problemas de optimización complejos. Su fuerza está en el equilibrio
+          entre exploración y explotación: buscan nuevas posibilidades, pero al mismo tiempo aprovechan las soluciones buenas que ya encontraron.
+        </p>
+        <p>
+          Su rendimiento depende mucho de la representación, de la selección, del cruce, de la mutación, del tamaño de la población y de
+          mecanismos como el elitismo. Por eso, un AG bien configurado puede acercarse mucho a una buena solución, incluso cuando el problema
+          es difícil.
+        </p>
+
+        <div class="mini-grid">
+          <div class="mini">
+            <strong>Exploración</strong>
+            <span>Permite buscar nuevas regiones del espacio de soluciones.</span>
+          </div>
+          <div class="mini">
+            <strong>Explotación</strong>
+            <span>Aprovecha las mejores soluciones encontradas hasta el momento.</span>
+          </div>
+          <div class="mini">
+            <strong>Diversidad</strong>
+            <span>Evita que el algoritmo se quede atrapado demasiado pronto.</span>
+          </div>
+          <div class="mini">
+            <strong>Elitismo</strong>
+            <span>Protege las mejores soluciones de una generación a otra.</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="preguntas">
+      <div class="section-title">
+        <h2>8. Preguntas tipo examen</h2>
+        <p class="subtitle">Con opciones y respuesta correcta indicada</p>
+      </div>
+
+      <div class="qa-grid">
+        <article class="qa-card">
+          <h3>1) ¿Qué inspira a los algoritmos genéticos?</h3>
+          <ul class="options">
+            <li>a) El procesamiento de señales digitales.</li>
+            <li>b) La evolución biológica y la genética.</li>
+            <li>c) La compresión de imágenes.</li>
+            <li>d) Los sistemas de base de datos.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) La evolución biológica y la genética. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>2) ¿Qué representa una población en un AG?</h3>
+          <ul class="options">
+            <li>a) Un solo individuo con la mejor solución.</li>
+            <li>b) Un conjunto de soluciones potenciales.</li>
+            <li>c) Una tabla de resultados aleatorios sin relación.</li>
+            <li>d) Un conjunto de fórmulas matemáticas fijas.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Un conjunto de soluciones potenciales. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>3) ¿Para qué sirve la función de aptitud?</h3>
+          <ul class="options">
+            <li>a) Para borrar los individuos débiles.</li>
+            <li>b) Para medir la calidad de cada solución.</li>
+            <li>c) Para convertir la población en texto.</li>
+            <li>d) Para evitar el cruce de padres.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Para medir la calidad de cada solución. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>4) ¿Cuál es el papel de la selección?</h3>
+          <ul class="options">
+            <li>a) Elegir qué individuos se reproducen.</li>
+            <li>b) Cambiar todos los genes al azar.</li>
+            <li>c) Eliminar por completo la diversidad.</li>
+            <li>d) Decidir el formato del archivo de salida.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Elegir qué individuos se reproducen. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>5) ¿Qué hace el cruce?</h3>
+          <ul class="options">
+            <li>a) Copia un individuo sin cambios.</li>
+            <li>b) Combina partes de dos padres para crear hijos.</li>
+            <li>c) Calcula la media de la población.</li>
+            <li>d) Convierte soluciones reales en árboles.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Combina partes de dos padres para crear hijos. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>6) ¿Cuál es la función principal de la mutación?</h3>
+          <ul class="options">
+            <li>a) Mantener la diversidad y explorar nuevas posibilidades.</li>
+            <li>b) Hacer que todos los individuos sean idénticos.</li>
+            <li>c) Bajar la calidad de la población siempre.</li>
+            <li>d) Evitar cualquier cambio en la población.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Mantener la diversidad y explorar nuevas posibilidades. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>7) ¿Qué problema aparece cuando la diversidad se pierde demasiado pronto?</h3>
+          <ul class="options">
+            <li>a) Aumento de la exactitud perfecta.</li>
+            <li>b) Convergencia prematura.</li>
+            <li>c) Cancelación automática del algoritmo.</li>
+            <li>d) Mejor exploración del espacio de búsqueda.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Convergencia prematura. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>8) ¿Qué hace el elitismo?</h3>
+          <ul class="options">
+            <li>a) Elimina a los mejores individuos.</li>
+            <li>b) Copia a los mejores individuos a la siguiente generación sin modificarlos.</li>
+            <li>c) Convierte toda la población en mutaciones aleatorias.</li>
+            <li>d) Evita la evaluación de la aptitud.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Copia a los mejores individuos a la siguiente generación sin modificarlos. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>9) ¿Qué caracteriza a la representación binaria?</h3>
+          <ul class="options">
+            <li>a) Usa solo números con decimales.</li>
+            <li>b) Usa cadenas de 0 y 1.</li>
+            <li>c) Usa estructuras de árbol.</li>
+            <li>d) Usa únicamente permutaciones.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Usa cadenas de 0 y 1. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>10) ¿Qué representación es útil cuando importa el orden de los elementos?</h3>
+          <ul class="options">
+            <li>a) Binaria.</li>
+            <li>b) Entera simple.</li>
+            <li>c) Permutación.</li>
+            <li>d) Solo la híbrida.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: c) Permutación. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>11) ¿Qué busca el teorema de los esquemas?</h3>
+          <ul class="options">
+            <li>a) Demostrar que los malos esquemas se multiplican.</li>
+            <li>b) Explicar por qué los buenos esquemas tienden a crecer.</li>
+            <li>c) Probar que el algoritmo no necesita selección.</li>
+            <li>d) Convertir la población en una lista ordenada.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Explicar por qué los buenos esquemas tienden a crecer. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>12) ¿Qué significa un esquema de bajo orden?</h3>
+          <ul class="options">
+            <li>a) Tiene pocas posiciones fijas.</li>
+            <li>b) Tiene demasiadas mutaciones obligatorias.</li>
+            <li>c) No puede participar en cruce.</li>
+            <li>d) Siempre es inválido.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Tiene pocas posiciones fijas. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>13) ¿Qué protege mejor a un esquema frente al cruce?</h3>
+          <ul class="options">
+            <li>a) Que sea largo y disperso.</li>
+            <li>b) Que sea compacto, con longitud definitoria pequeña.</li>
+            <li>c) Que tenga muchas posiciones mutables.</li>
+            <li>d) Que no tenga aptitud.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Que sea compacto, con longitud definitoria pequeña. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>14) ¿Por qué la mutación no debe ser demasiado alta?</h3>
+          <ul class="options">
+            <li>a) Porque hace que el algoritmo se vuelva casi aleatorio.</li>
+            <li>b) Porque elimina toda la población al instante.</li>
+            <li>c) Porque impide que exista cualquier variación.</li>
+            <li>d) Porque convierte el problema en uno de clasificación.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Porque hace que el algoritmo se vuelva casi aleatorio. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>15) ¿Cuál es la idea más importante para recordar sobre un algoritmo genético?</h3>
+          <ul class="options">
+            <li>a) Trabaja con una sola solución fija.</li>
+            <li>b) Evoluciona una población de soluciones usando selección, cruce y mutación.</li>
+            <li>c) Solo sirve para problemas triviales.</li>
+            <li>d) No necesita criterios de parada.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Evoluciona una población de soluciones usando selección, cruce y mutación. Buena opción: sí.</div>
+        </article>
+      </div>
+
+      <div class="nav-links">
+        <a class="button" href="#introduccion">Volver arriba</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Hecho solo con HTML5 y CSS3 puro. Contenido desarrollado únicamente a partir del PDF proporcionado.
+  </footer>
+</body>
+</html>

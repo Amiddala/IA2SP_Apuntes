@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Razonamiento con Incertidumbre — Apuntes de Estudio</title>
+  <style>
+    :root{
+      --bg:#08111f;
+      --panel:#111827;
+      --card:#1f2937;
+      --soft:#334155;
+      --text:#e5e7eb;
+      --muted:#cbd5e1;
+      --accent:#60a5fa;
+      --accent-2:#34d399;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --border:rgba(255,255,255,.08);
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:20px;
+      --max:1140px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(52,211,153,.10), transparent 35%),
+        linear-gradient(180deg, #07101d 0%, #0f172a 100%);
+      color:var(--text);
+      line-height:1.72;
+    }
+
+    a{color:inherit; text-decoration:none}
+    .wrap{
+      width:min(var(--max), calc(100% - 32px));
+      margin:0 auto;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      backdrop-filter: blur(14px);
+      background: rgba(15,23,42,.78);
+      border-bottom:1px solid var(--border);
+    }
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 0;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .brand-badge{
+      width:40px;height:40px;border-radius:14px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow);
+    }
+    nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    nav a{
+      padding:10px 14px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      font-size:.95rem;
+      transition:.2s ease;
+    }
+    nav a:hover{
+      transform:translateY(-1px);
+      border-color:rgba(96,165,250,.45);
+      color:white;
+      background:rgba(96,165,250,.10);
+    }
+
+    .hero{
+      padding:42px 0 18px;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.35fr .85fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    .hero-card, .panel, .qa-card{
+      background: rgba(17,24,39,.88);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-card{
+      padding:28px;
+    }
+    h1{
+      margin:0 0 12px;
+      line-height:1.08;
+      font-size: clamp(2rem, 4vw, 3.35rem);
+    }
+    .lead{
+      color:var(--muted);
+      font-size:1.03rem;
+      margin:0 0 18px;
+      max-width:72ch;
+    }
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+    .pill{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:.92rem;
+    }
+    .side-card{
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:space-between;
+    }
+    .side-card h2{
+      margin:0;
+      font-size:1.15rem;
+    }
+    .side-card p{
+      margin:0;
+      color:var(--muted);
+    }
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .stat{
+      padding:14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--border);
+    }
+    .stat strong{
+      display:block;
+      font-size:1.4rem;
+      color:white;
+      margin-bottom:4px;
+    }
+    .stat span{color:var(--muted); font-size:.9rem}
+
+    main{padding:10px 0 60px}
+    section{
+      margin-top:22px;
+      scroll-margin-top:88px;
+    }
+    .section-title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin:0 0 12px;
+      flex-wrap:wrap;
+    }
+    h2{
+      margin:0;
+      font-size:1.55rem;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin:0;
+      font-size:.95rem;
+    }
+    .panel{
+      padding:24px;
+    }
+    h3{
+      margin:20px 0 8px;
+      font-size:1.12rem;
+    }
+    p{margin:0 0 12px}
+    ul, ol{margin:10px 0 14px 22px}
+    li{margin:6px 0}
+    .callout{
+      margin:16px 0;
+      padding:16px 16px 16px 18px;
+      border-left:4px solid var(--accent);
+      background:rgba(96,165,250,.08);
+      border-radius:14px;
+      color:var(--text);
+    }
+    .callout.alt{border-left-color: var(--accent-2); background: rgba(52,211,153,.08)}
+    .callout.warn{border-left-color: var(--warn); background: rgba(251,191,36,.08)}
+    .callout.danger{border-left-color: var(--danger); background: rgba(251,113,133,.08)}
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .mini{
+      padding:16px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:rgba(255,255,255,.03);
+    }
+    .mini strong{
+      display:block;
+      margin-bottom:6px;
+      color:#fff;
+    }
+    .mini span{color:var(--muted)}
+    .nav-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+    .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      transition:.2s ease;
+    }
+    .button:hover{
+      transform:translateY(-1px);
+      border-color:rgba(96,165,250,.45);
+      background:rgba(96,165,250,.09);
+    }
+    .qa-grid{
+      display:grid;
+      gap:14px;
+      margin-top:14px;
+    }
+    .qa-card{
+      padding:18px;
+    }
+    .qa-card h3{
+      margin-top:0;
+      font-size:1.02rem;
+    }
+    .options{
+      list-style:none;
+      padding:0;
+      margin:12px 0 0;
+      display:grid;
+      gap:8px;
+    }
+    .options li{
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      margin:0;
+    }
+    .answer{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(52,211,153,.35);
+      background:rgba(52,211,153,.08);
+      color:#dcfce7;
+    }
+    .footer{
+      padding:30px 0 44px;
+      color:var(--muted);
+      text-align:center;
+      font-size:.95rem;
+    }
+
+    @media (max-width: 900px){
+      .hero-grid{grid-template-columns:1fr}
+      .mini-grid{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(var(--max), calc(100% - 22px))}
+      .hero-card, .panel, .qa-card{padding:18px}
+      .topbar-inner{padding:12px 0}
+      nav a{padding:9px 11px; font-size:.9rem}
+      h2{font-size:1.3rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true"></div>
+        <div>
+          <div>Razonamiento con Incertidumbre</div>
+          <small style="color:var(--muted)">Apuntes de estudio basados solo en el PDF</small>
+        </div>
+      </div>
+      <nav aria-label="Navegación">
+        <a href="#introduccion">Introducción</a>
+        <a href="#conceptos">Conceptos</a>
+        <a href="#inferencia">Inferencia</a>
+        <a href="#redes">Redes bayesianas</a>
+        <a href="#poliarboles">Poliárboles</a>
+        <a href="#preguntas">Preguntas</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="wrap hero-grid">
+      <article class="hero-card">
+        <h1>Razonamiento con incertidumbre: teoría clara y extensa para estudiar</h1>
+        <p class="lead">
+          Este capítulo resume y desarrolla el PDF de Nils Nilsson con un estilo limpio para repasar rápido:
+          qué significa razonar bajo incertidumbre, cómo se usan las probabilidades, cómo se hace inferencia con evidencia,
+          por qué importan las independencias condicionales y cómo las redes bayesianas reducen la complejidad.
+        </p>
+        <div class="callout">
+          La idea central es que no siempre se sabe con certeza si una proposición es verdadera o falsa; por eso se usa probabilidad para representar grados de creencia.
+        </div>
+        <div class="pill-row">
+          <span class="pill">Variables aleatorias</span>
+          <span class="pill">Probabilidad conjunta</span>
+          <span class="pill">Condicional</span>
+          <span class="pill">Bayes</span>
+          <span class="pill">Independencia condicional</span>
+          <span class="pill">Separación-d</span>
+        </div>
+      </article>
+
+      <aside class="hero-card side-card">
+        <div>
+          <h2>Qué aparece en el PDF</h2>
+          <p>El robot apilador de bloques, la batería, el brazo, el bloque levantable, indicadores, sensores y redes bayesianas.</p>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <strong>1</strong>
+            <span>idea principal</span>
+          </div>
+          <div class="stat">
+            <strong>3</strong>
+            <span>patrones de inferencia</span>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <span>teorema clave</span>
+          </div>
+          <div class="stat">
+            <strong>1</strong>
+            <span>estructura eficiente</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <main class="wrap">
+    <section id="introduccion">
+      <div class="section-title">
+        <h2>1. Introducción</h2>
+        <p class="subtitle">Qué problema intenta resolver este capítulo</p>
+      </div>
+      <article class="panel">
+        <p>
+          El capítulo empieza con una observación muy importante: en muchas tareas un agente no posee información completa sobre su entorno.
+          Puede saber algunas cosas, pero otras siguen siendo inciertas. La lógica clásica funciona bien cuando las premisas son seguras, pero
+          no describe de forma natural cuánto se cree en una proposición cuando no hay total certeza.
+        </p>
+        <p>
+          Para resolver eso, el texto adopta el formalismo probabilístico. La probabilidad permite asignar valores entre 0 y 1 a sucesos o proposiciones
+          y realizar cálculos cuando aparece nueva evidencia. En vez de pensar solo en “verdadero” o “falso”, el capítulo trabaja con grados de certeza.
+        </p>
+
+        <div class="callout alt">
+          En el marco del PDF, las probabilidades cumplen el papel de una alternativa probabilística a la representación lógica de hechos inciertos.
+        </div>
+
+        <h3>Por qué esto es útil</h3>
+        <ul>
+          <li>Permite representar conocimiento incompleto.</li>
+          <li>Sirve para inferir información nueva a partir de evidencia parcial.</li>
+          <li>Hace posible modelar sensores imperfectos y observaciones dudosas.</li>
+          <li>Ayuda a estructurar el conocimiento para que el razonamiento sea más eficiente.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="conceptos">
+      <div class="section-title">
+        <h2>2. Conceptos fundamentales</h2>
+        <p class="subtitle">Las piezas básicas que usa todo el capítulo</p>
+      </div>
+      <article class="panel">
+        <h3>2.1 Variables aleatorias</h3>
+        <p>
+          El texto trabaja con variables aleatorias <strong>V1, V2, ..., Vk</strong>. Una variable aleatoria representa una característica del dominio
+          sobre la que queremos razonar. En los ejemplos del PDF, esas variables suelen corresponder a proposiciones como si la batería está cargada,
+          si el brazo se mueve o si un bloque se puede levantar.
+        </p>
+        <p>
+          Cuando una variable representa una proposición, sus valores son Verdadero o Falso. Cuando representa una medida física, sus valores pueden ser
+          numéricos. Cuando representa una categoría, los valores son categóricos. El capítulo remarca que el tipo de valor depende de lo que la variable
+          describa en el dominio.
+        </p>
+
+        <h3>2.2 Probabilidad conjunta</h3>
+        <p>
+          La probabilidad conjunta habla de varios eventos o variables al mismo tiempo. El texto usa la notación
+          <strong>p(V1 = v1, V2 = v2, ..., Vk = vk)</strong>. Esa expresión indica la probabilidad de que todas las variables tomen simultáneamente
+          esos valores concretos.
+        </p>
+        <p>
+          El PDF presenta el ejemplo de una moneda para mostrar cómo una función conjunta asigna probabilidades a combinaciones completas de resultados.
+          También recuerda que cada valor debe estar entre 0 y 1, y que la suma total de todas las asignaciones posibles debe dar 1.
+        </p>
+
+        <h3>2.3 Probabilidad marginal</h3>
+        <p>
+          Una probabilidad marginal se obtiene sumando probabilidades conjuntas más detalladas. Si se quiere saber la probabilidad de una variable sin
+          fijar las demás, se suman todas las combinaciones compatibles con el valor buscado.
+        </p>
+        <p>
+          El capítulo usa este procedimiento para obtener, por ejemplo, la probabilidad de que la batería esté cargada sumando todas las combinaciones
+          en las que B es verdadero.
+        </p>
+
+        <h3>2.4 Notación abreviada</h3>
+        <p>
+          El texto también aclara una notación breve para variables proposicionales: cuando una variable aparece afirmada se asume Verdadero, y cuando
+          aparece negada se asume Falso. Esta abreviación solo se usa cuando el contexto deja claro que se habla de una instanciación concreta y no de
+          una distribución completa.
+        </p>
+
+        <div class="mini-grid">
+          <div class="mini">
+            <strong>Conjunta</strong>
+            <span>Probabilidad de varios hechos al mismo tiempo.</span>
+          </div>
+          <div class="mini">
+            <strong>Marginal</strong>
+            <span>Probabilidad de una variable aislada a partir de las conjuntas.</span>
+          </div>
+          <div class="mini">
+            <strong>Condicional</strong>
+            <span>Probabilidad de un hecho sabiendo que otro ya ocurrió.</span>
+          </div>
+          <div class="mini">
+            <strong>Evidence</strong>
+            <span>Información observada que sirve para inferir lo desconocido.</span>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="inferencia">
+      <div class="section-title">
+        <h2>3. Probabilidad condicional e inferencia</h2>
+        <p class="subtitle">Cómo se actualiza el conocimiento usando evidencia</p>
+      </div>
+      <article class="panel">
+        <h3>3.1 Qué es una probabilidad condicional</h3>
+        <p>
+          La probabilidad condicional expresa la probabilidad de una variable dado que otra ya se conoce. El PDF la define como una versión
+          normalizada de la probabilidad conjunta. La idea intuitiva es sencilla: si ya sabemos que cierta evidencia ocurrió, entonces solo
+          nos interesan los casos compatibles con esa evidencia.
+        </p>
+        <p>
+          El texto ilustra esto con el robot apilador. Por ejemplo, si el brazo no se mueve, el agente quiere estimar la probabilidad de que
+          la batería esté cargada. Ese es precisamente el tipo de pregunta que resuelven las probabilidades condicionales.
+        </p>
+
+        <h3>3.2 Inferencia probabilística</h3>
+        <p>
+          Inferir significa calcular la probabilidad de una variable desconocida a partir de evidencia conocida. El capítulo presenta esta tarea
+          como la versión probabilística de la inferencia lógica, pero en un contexto donde no se trabaja con verdades absolutas.
+        </p>
+        <p>
+          El procedimiento general consiste en tomar la evidencia E = e y calcular la probabilidad de una hipótesis V dada esa evidencia.
+          El texto muestra que esto puede hacerse sumando las probabilidades conjuntas compatibles con la observación.
+        </p>
+
+        <div class="callout">
+          Ejemplo del PDF: a partir de las probabilidades conjuntas de P, Q y R, y usando la evidencia ¬R, se calcula p(Q | ¬R) y el resultado mostrado es 0.75.
+        </div>
+
+        <h3>3.3 Teorema de Bayes</h3>
+        <p>
+          Uno de los resultados más importantes del capítulo es el teorema de Bayes. El texto lo presenta como una forma de reescribir una
+          probabilidad condicional a partir de la inversa y una normalización. Es clave para el razonamiento diagnóstico, donde se infiere una causa
+          a partir de un efecto observado.
+        </p>
+        <p>
+          En la práctica, Bayes permite pasar de “sé el efecto” a “qué tan probable es la causa”. Por eso aparece en ejemplos donde la evidencia
+          observada no es una causa directa, sino un síntoma o una señal.
+        </p>
+
+        <h3>3.4 Qué ocurre con la evidencia incierta</h3>
+        <p>
+          El capítulo aclara que la evidencia usada en los cálculos debe ser cierta o falsa. Si una observación es incierta, se puede modelar
+          añadiendo un nodo hijo que represente la lectura del sensor. Ese nodo sí puede tratarse como evidencia segura, mientras que el nodo original
+          conserva la incertidumbre.
+        </p>
+        <p>
+          Así, el texto propone representar sensores imperfectos y luego razonar sobre sus lecturas, en vez de asumir que todo lo observado es completamente fiable.
+        </p>
+      </article>
+    </section>
+
+    <section id="redes">
+      <div class="section-title">
+        <h2>4. Independencia condicional y redes bayesianas</h2>
+        <p class="subtitle">La estructura que hace viable el cálculo</p>
+      </div>
+      <article class="panel">
+        <h3>4.1 Independencia condicional</h3>
+        <p>
+          El PDF define independencia condicional como la situación en la que una variable ya no aporta información adicional sobre otra,
+          una vez que se conoce un tercer conjunto de variables. En palabras simples: si ya sé cierto contexto, otra variable deja de ayudarme
+          para predecir el resultado.
+        </p>
+        <p>
+          El ejemplo del robot lo muestra con claridad: si ya se sabe que la batería está cargada, el indicador no agrega información extra sobre
+          el movimiento del brazo en relación con ese conocimiento.
+        </p>
+
+        <h3>4.2 Qué es una red bayesiana</h3>
+        <p>
+          Una red bayesiana es un grafo dirigido acíclico cuyos nodos son variables aleatorias. El documento indica que cada nodo es condicionalmente
+          independiente de sus no descendientes, dados sus padres. Esa propiedad no es solo una definición teórica: es la razón por la que la red
+          permite simplificar muchísimo los cálculos.
+        </p>
+        <p>
+          En lugar de especificar todas las combinaciones posibles de todas las variables, la red permite describir cada nodo mediante su propia
+          tabla de probabilidades condicionales. Así, el conocimiento queda organizado según dependencias locales.
+        </p>
+
+        <h3>4.3 Interpretación causal</h3>
+        <p>
+          El texto señala que muchas redes bayesianas se construyen interpretando los arcos como relaciones de causa y efecto. Si un experto piensa
+          en causas que producen efectos, suele ser más fácil identificar independencias condicionales razonables y estructurar la red de forma más útil.
+        </p>
+
+        <h3>4.4 Ventaja principal de la red</h3>
+        <p>
+          La ventaja más importante es la reducción de complejidad. Sin independencias, especificar la distribución conjunta completa puede ser
+          intratable. Con una red bayesiana, el número de valores necesarios baja muchísimo porque cada nodo solo depende de sus padres.
+        </p>
+
+        <div class="callout alt">
+          En el ejemplo del capítulo, la red del robot apilador requiere muchas menos probabilidades que una tabla completa de 16 combinaciones.
+        </div>
+      </article>
+    </section>
+
+    <section id="patrones">
+      <div class="section-title">
+        <h2>5. Patrones de inferencia en redes bayesianas</h2>
+        <p class="subtitle">Tres formas típicas de razonar en la red</p>
+      </div>
+      <article class="panel">
+        <h3>5.1 Inferencia causal o descendente</h3>
+        <p>
+          Este patrón va de una causa hacia un efecto. El PDF lo usa cuando se calcula la probabilidad de un nodo de consulta a partir de evidencias
+          en sus causas o ancestros. Se trabaja expandiendo la probabilidad del nodo de consulta y sumando sobre los padres que no están observados.
+        </p>
+        <p>
+          La idea es aprovechar la estructura de la red para no recalcular todo desde cero. Primero se descompone el problema, luego se usan las
+          probabilidades condicionales locales y al final se combinan los resultados.
+        </p>
+        <div class="callout">
+          Resultado mostrado por el texto en el ejemplo causal: p(S | O) = 0.855.
+        </div>
+
+        <h3>5.2 Inferencia diagnóstica o ascendente</h3>
+        <p>
+          Aquí el razonamiento va desde un efecto observado hacia su causa probable. El texto lo presenta como una aplicación directa del teorema de Bayes.
+          Cuando se observa un síntoma, la pregunta pasa a ser qué causa lo explica mejor.
+        </p>
+        <p>
+          Este patrón es muy útil cuando la evidencia es una consecuencia de algo no observado. El capítulo remarca que Bayes es el paso principal
+          para transformar el problema en uno causal.
+        </p>
+        <div class="callout">
+          Resultado mostrado por el texto en el ejemplo diagnóstico: p(¬O | ¬S) = 0.88632.
+        </div>
+
+        <h3>5.3 Inferencia intercausal o justificación</h3>
+        <p>
+          Ocurre cuando una evidencia adicional reduce la plausibilidad de otra causa. Si ya hay una explicación para un efecto observado, una nueva causa
+          puede justificar menos la misma observación. El texto lo muestra con el ejemplo de la batería y el bloque.
+        </p>
+        <p>
+          En este patrón, la nueva evidencia no simplemente suma información: cambia el peso de otras hipótesis. El PDF destaca que aquí se usa
+          un razonamiento causal incrustado dentro de un razonamiento diagnóstico.
+        </p>
+        <div class="callout">
+          Resultado mostrado por el texto en el ejemplo de justificación: p(¬O | ¬B, ¬S) = 0.030.
+        </div>
+      </article>
+    </section>
+
+    <section id="separacion">
+      <div class="section-title">
+        <h2>6. Separación-d y bloqueos de caminos</h2>
+        <p class="subtitle">Cómo decidir si dos nodos quedan independizados por la evidencia</p>
+      </div>
+      <article class="panel">
+        <p>
+          La separación-d es el mecanismo que permite identificar cuándo dos nodos son condicionalmente independientes dado un conjunto de evidencia.
+          El texto explica que un camino queda bloqueado si se cumple alguna de tres condiciones sobre un nodo intermedio.
+        </p>
+        <ul>
+          <li>Si el nodo intermedio pertenece a la evidencia y ambos arcos salen de él.</li>
+          <li>Si el nodo intermedio pertenece a la evidencia y un arco entra y otro sale de él.</li>
+          <li>Si el nodo intermedio no pertenece a la evidencia ni tiene descendientes en ella, y ambos arcos van hacia él.</li>
+        </ul>
+        <p>
+          Si todos los caminos entre dos nodos quedan bloqueados, entonces la evidencia separa-d esos nodos y se puede concluir independencia
+          condicional entre ellos.
+        </p>
+
+        <h3>Qué aporta esto en la práctica</h3>
+        <p>
+          La separación-d evita recorrer caminos que no afectan a la inferencia. Esto reduce cálculos innecesarios y ayuda a entender por qué ciertas
+          variables sí influyen y otras ya no, dado lo que se conoce.
+        </p>
+      </article>
+    </section>
+
+    <section id="poliarboles">
+      <div class="section-title">
+        <h2>7. Poliárboles, complejidad y métodos adicionales</h2>
+        <p class="subtitle">Dónde el cálculo se vuelve manejable y qué pasa cuando ya no lo es</p>
+      </div>
+      <article class="panel">
+        <h3>7.1 Qué es un poliárbol</h3>
+        <p>
+          Un poliárbol es una red bayesiana donde entre cualquier par de nodos existe un único camino si se ignora la dirección de los arcos.
+          El PDF usa esta clase de redes porque en ellas la inferencia puede hacerse de manera más ordenada.
+        </p>
+
+        <h3>7.2 Apoyo causal y apoyo evidencial</h3>
+        <p>
+          El capítulo distingue dos situaciones: evidencia por encima del nodo de consulta y evidencia por debajo del nodo de consulta.
+          En el primer caso se usa apoyo causal; en el segundo, apoyo evidencial. Cuando hay evidencia de ambos lados, se combinan ambas formas
+          mediante Bayes y una constante de normalización.
+        </p>
+        <p>
+          El texto incluso muestra un ejemplo numérico donde se obtiene p(Q | U) = 0.13, después de calcular primero los apoyos causal y evidencial
+          por separado.
+        </p>
+
+        <h3>7.3 Complejidad</h3>
+        <p>
+          El documento aclara que, aun con estas simplificaciones, la inferencia general puede ser muy costosa. En el peor caso, crece de manera
+          exponencial con el número de variables. Por eso se mencionan estrategias como eliminación del compartimiento, muestreo lógico y agrupamiento.
+        </p>
+
+        <h3>7.4 Métodos complementarios</h3>
+        <ul>
+          <li><strong>Muestreo lógico:</strong> repite asignaciones aleatorias consistentes con la red para estimar probabilidades.</li>
+          <li><strong>Agrupamiento:</strong> combina nodos en “meganodos” para transformar la red en una forma más manejable.</li>
+          <li><strong>Eliminación del compartimiento:</strong> evita subcálculos redundantes.</li>
+        </ul>
+
+        <div class="callout danger">
+          Cuando la red ya no es un poliárbol, los procedimientos recursivos simples pueden dejar de terminar de forma práctica.
+        </div>
+      </article>
+    </section>
+
+    <section id="ejemplos">
+      <div class="section-title">
+        <h2>8. Ejemplos prácticos del PDF</h2>
+        <p class="subtitle">Resultados que conviene recordar</p>
+      </div>
+      <article class="panel">
+        <ul>
+          <li><strong>p(Q | ¬R) = 0.75</strong> a partir de una tabla de probabilidades conjuntas de P, Q y R.</li>
+          <li><strong>p(S | O) = 0.855</strong> en una inferencia causal con el robot.</li>
+          <li><strong>p(¬O | ¬S) = 0.88632</strong> en una inferencia diagnóstica.</li>
+          <li><strong>p(¬O | ¬B, ¬S) = 0.030</strong> en una inferencia intercausal.</li>
+          <li><strong>p(Q | U) = 0.13</strong> en el ejemplo numérico del poliárbol abstracto.</li>
+        </ul>
+        <p>
+          Estos ejemplos muestran el mismo patrón: primero se identifica el tipo de evidencia, luego se aplica la estructura de la red y finalmente
+          se normaliza el resultado.
+        </p>
+      </article>
+    </section>
+
+    <section id="resumen">
+      <div class="section-title">
+        <h2>9. Resumen final corto</h2>
+        <p class="subtitle">Lo esencial para memorizar rápido</p>
+      </div>
+      <article class="panel">
+        <p>
+          Razonar con incertidumbre significa trabajar con información incompleta usando probabilidades. El capítulo construye la base con
+          probabilidad conjunta, marginal, condicional, Bayes e inferencia probabilística.
+        </p>
+        <p>
+          Después muestra que las redes bayesianas y la independencia condicional permiten organizar el conocimiento de forma compacta.
+          La separación-d ayuda a saber qué información queda bloqueada y qué información sigue influyendo.
+        </p>
+        <p>
+          La idea más importante es esta: <strong>la estructura correcta del conocimiento reduce de forma enorme el costo del razonamiento</strong>.
+        </p>
+      </article>
+    </section>
+
+    <section id="preguntas">
+      <div class="section-title">
+        <h2>10. Preguntas tipo examen</h2>
+        <p class="subtitle">Opciones múltiples con respuesta correcta al final</p>
+      </div>
+
+      <div class="qa-grid">
+        <article class="qa-card">
+          <h3>1) ¿Cuál es la idea principal del capítulo?</h3>
+          <ul class="options">
+            <li>a) Reemplazar toda incertidumbre por lógica clásica.</li>
+            <li>b) Representar y razonar con conocimiento incierto usando probabilidades.</li>
+            <li>c) Evitar cualquier forma de inferencia.</li>
+            <li>d) Trabajar solo con números enteros sin evidencia.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Representar y razonar con conocimiento incierto usando probabilidades.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>2) ¿Qué describe mejor una variable aleatoria en el capítulo?</h3>
+          <ul class="options">
+            <li>a) Un valor fijo que nunca cambia.</li>
+            <li>b) Una característica del dominio sobre la que queremos razonar.</li>
+            <li>c) Un operador lógico sin contenido semántico.</li>
+            <li>d) Una matriz de decisión obligatoria.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Una característica del dominio sobre la que queremos razonar.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>3) ¿Qué es una probabilidad conjunta?</h3>
+          <ul class="options">
+            <li>a) La probabilidad de una sola variable sin contexto.</li>
+            <li>b) La probabilidad de varias variables a la vez.</li>
+            <li>c) La negación de toda evidencia.</li>
+            <li>d) Un tipo de árbol de decisión.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) La probabilidad de varias variables a la vez.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>4) ¿Qué condición debe cumplir una distribución de probabilidad?</h3>
+          <ul class="options">
+            <li>a) Todas las probabilidades deben ser mayores que 1.</li>
+            <li>b) Cada valor debe estar entre 0 y 1 y la suma total debe ser 1.</li>
+            <li>c) Solo pueden existir valores positivos enteros.</li>
+            <li>d) La suma total debe ser 0.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Cada valor debe estar entre 0 y 1 y la suma total debe ser 1.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>5) ¿Qué permite la probabilidad condicional?</h3>
+          <ul class="options">
+            <li>a) Ignorar toda evidencia.</li>
+            <li>b) Actualizar la probabilidad de una variable dado que otra ya se conoce.</li>
+            <li>c) Cambiar una red bayesiana por una lista plana.</li>
+            <li>d) Reemplazar la probabilidad por una constante.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Actualizar la probabilidad de una variable dado que otra ya se conoce.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>6) ¿Qué papel juega el teorema de Bayes?</h3>
+          <ul class="options">
+            <li>a) Sirve para convertir un problema de diagnóstico en uno de tipo causal.</li>
+            <li>b) Sirve para eliminar el uso de evidencia.</li>
+            <li>c) Sirve para ordenar alfabéticamente las variables.</li>
+            <li>d) Sirve para impedir cualquier normalización.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Sirve para convertir un problema de diagnóstico en uno de tipo causal.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>7) ¿Qué significa independencia condicional?</h3>
+          <ul class="options">
+            <li>a) Que una variable ya no aporta información adicional una vez conocido otro conjunto.</li>
+            <li>b) Que dos variables siempre son idénticas.</li>
+            <li>c) Que no existe ninguna evidencia en el problema.</li>
+            <li>d) Que toda probabilidad vale 1/2.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Que una variable ya no aporta información adicional una vez conocido otro conjunto.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>8) ¿Qué es una red bayesiana?</h3>
+          <ul class="options">
+            <li>a) Un grafo dirigido acíclico con variables aleatorias.</li>
+            <li>b) Una tabla sin dependencias.</li>
+            <li>c) Un modelo sin nodos ni arcos.</li>
+            <li>d) Un conjunto de ecuaciones físicas.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Un grafo dirigido acíclico con variables aleatorias.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>9) ¿Qué ventaja principal da una red bayesiana?</h3>
+          <ul class="options">
+            <li>a) Hace más grande la tabla conjunta.</li>
+            <li>b) Reduce la complejidad al usar independencias condicionales.</li>
+            <li>c) Elimina la necesidad de tablas de probabilidad.</li>
+            <li>d) Impide cualquier forma de inferencia.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Reduce la complejidad al usar independencias condicionales.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>10) ¿Qué tipo de inferencia va de causa a efecto?</h3>
+          <ul class="options">
+            <li>a) Diagnóstica.</li>
+            <li>b) Intercausal.</li>
+            <li>c) Causal o descendente.</li>
+            <li>d) Aleatoria.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: c) Causal o descendente.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>11) ¿Qué tipo de inferencia va de efecto a causa?</h3>
+          <ul class="options">
+            <li>a) Diagnóstica o ascendente.</li>
+            <li>b) Causal.</li>
+            <li>c) Por margen.</li>
+            <li>d) No existe en el capítulo.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Diagnóstica o ascendente.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>12) ¿Qué hace la inferencia intercausal?</h3>
+          <ul class="options">
+            <li>a) Aumenta siempre la probabilidad de cualquier causa.</li>
+            <li>b) Hace que una evidencia adicional justifique menos otra causa.</li>
+            <li>c) Elimina por completo la red bayesiana.</li>
+            <li>d) Convierte la red en una tabla booleana.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Hace que una evidencia adicional justifique menos otra causa.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>13) ¿Para qué sirve la separación-d?</h3>
+          <ul class="options">
+            <li>a) Para comprobar si un camino queda bloqueado por la evidencia.</li>
+            <li>b) Para ordenar nodos al azar.</li>
+            <li>c) Para cambiar la función de aptitud.</li>
+            <li>d) Para calcular solo probabilidades marginales.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Para comprobar si un camino queda bloqueado por la evidencia.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>14) ¿Qué es un poliárbol?</h3>
+          <ul class="options">
+            <li>a) Un grafo donde no existe ningún camino entre nodos.</li>
+            <li>b) Un GDA con un único camino entre cualquier par de nodos si se ignora la dirección.</li>
+            <li>c) Una lista de probabilidades independientes.</li>
+            <li>d) Una matriz de valores sin dependencias.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Un GDA con un único camino entre cualquier par de nodos si se ignora la dirección.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>15) ¿Qué advierte el capítulo sobre la complejidad general?</h3>
+          <ul class="options">
+            <li>a) Que siempre es lineal en cualquier red.</li>
+            <li>b) Que puede crecer de forma exponencial en el peor caso.</li>
+            <li>c) Que desaparece si hay evidencia.</li>
+            <li>d) Que solo depende del número de arcos, nunca de nodos.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Que puede crecer de forma exponencial en el peor caso.</div>
+        </article>
+      </div>
+
+      <div class="nav-links">
+        <a class="button" href="#introduccion">Volver arriba</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Hecho con HTML5 y CSS3 puro. Contenido basado únicamente en el PDF proporcionado.
+  </footer>
+</body>
+</html>

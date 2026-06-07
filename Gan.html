@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redes Generativas Antagónicas — Apuntes de Estudio</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#111827;
+      --panel-2:#162033;
+      --card:#1f2937;
+      --line:rgba(255,255,255,.08);
+      --text:#e5e7eb;
+      --muted:#cbd5e1;
+      --accent:#60a5fa;
+      --accent-2:#34d399;
+      --warn:#fbbf24;
+      --danger:#fb7185;
+      --ok:#86efac;
+      --shadow:0 20px 60px rgba(0,0,0,.30);
+      --radius:20px;
+      --max:1140px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      line-height:1.72;
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(52,211,153,.10), transparent 32%),
+        linear-gradient(180deg, #07101d 0%, #0b1220 100%);
+    }
+
+    a{color:inherit; text-decoration:none}
+    .wrap{width:min(var(--max), calc(100% - 28px)); margin:0 auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:1000;
+      backdrop-filter: blur(14px);
+      background:rgba(11,18,32,.80);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:14px 0;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+    .brand-badge{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow:var(--shadow);
+      flex:none;
+    }
+    .brand small{display:block; color:var(--muted); font-weight:500}
+
+    nav{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    nav a, .button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      transition:.2s ease;
+      font-size:.95rem;
+    }
+    nav a:hover, .button:hover{
+      transform:translateY(-1px);
+      border-color:rgba(96,165,250,.45);
+      background:rgba(96,165,250,.10);
+      color:#fff;
+    }
+
+    .hero{padding:42px 0 18px}
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.35fr .85fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    .hero-card, .panel, .qa-card{
+      background:rgba(17,24,39,.90);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .hero-card{padding:28px}
+    h1{
+      margin:0 0 12px;
+      line-height:1.08;
+      font-size:clamp(2rem, 4vw, 3.4rem);
+    }
+    .lead{margin:0 0 18px; color:var(--muted); font-size:1.02rem; max-width:72ch}
+
+    .pill-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+    .pill{
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      color:var(--text);
+      font-size:.92rem;
+    }
+
+    .side-card{
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      justify-content:space-between;
+    }
+    .side-card h2{margin:0; font-size:1.16rem}
+    .side-card p{margin:0; color:var(--muted)}
+    .stats{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .stat{
+      padding:14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--line);
+    }
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      color:#fff;
+      margin-bottom:4px;
+    }
+    .stat span{color:var(--muted); font-size:.9rem}
+
+    main{padding:10px 0 58px}
+    section{
+      margin-top:22px;
+      scroll-margin-top:92px;
+    }
+    .section-title{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      margin:0 0 12px;
+      flex-wrap:wrap;
+    }
+    h2{margin:0; font-size:1.55rem}
+    .subtitle{margin:0; color:var(--muted); font-size:.95rem}
+
+    .panel{padding:24px}
+    h3{
+      margin:20px 0 8px;
+      font-size:1.12rem;
+    }
+    p{margin:0 0 12px}
+    ul, ol{margin:10px 0 14px 22px}
+    li{margin:6px 0}
+
+    .callout{
+      margin:16px 0;
+      padding:16px 16px 16px 18px;
+      border-left:4px solid var(--accent);
+      background:rgba(96,165,250,.08);
+      border-radius:14px;
+    }
+    .callout.alt{border-left-color:var(--accent-2); background:rgba(52,211,153,.08)}
+    .callout.warn{border-left-color:var(--warn); background:rgba(251,191,36,.08)}
+    .callout.danger{border-left-color:var(--danger); background:rgba(251,113,133,.08)}
+    .callout.ok{border-left-color:var(--ok); background:rgba(134,239,172,.08)}
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:14px;
+      margin-top:14px;
+    }
+    .mini{
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:rgba(255,255,255,.03);
+    }
+    .mini strong{display:block; margin-bottom:6px; color:#fff}
+    .mini span{color:var(--muted)}
+
+    .nav-links{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .qa-grid{
+      display:grid;
+      gap:14px;
+      margin-top:14px;
+    }
+    .qa-card{padding:18px}
+    .qa-card h3{margin-top:0; font-size:1.02rem}
+    .options{
+      list-style:none;
+      padding:0;
+      margin:12px 0 0;
+      display:grid;
+      gap:8px;
+    }
+    .options li{
+      padding:10px 12px;
+      margin:0;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+    }
+    .answer{
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(134,239,172,.30);
+      background:rgba(134,239,172,.08);
+      color:#dcfce7;
+    }
+
+    .footer{
+      padding:30px 0 44px;
+      color:var(--muted);
+      text-align:center;
+      font-size:.95rem;
+    }
+
+    .tagline{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+    .tag{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      border-radius:12px;
+      padding:8px 10px;
+      color:var(--muted);
+      font-size:.88rem;
+    }
+
+    @media (max-width: 920px){
+      .hero-grid{grid-template-columns:1fr}
+      .mini-grid{grid-template-columns:1fr}
+    }
+    @media (max-width: 640px){
+      .wrap{width:min(var(--max), calc(100% - 18px))}
+      .hero-card, .panel, .qa-card{padding:18px}
+      nav a{padding:9px 11px; font-size:.9rem}
+      .topbar-inner{padding:12px 0}
+      h2{font-size:1.3rem}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true"></div>
+        <div>
+          <div>Redes Generativas Antagónicas</div>
+          <small>Apuntes de estudio basados solo en tu PDF</small>
+        </div>
+      </div>
+      <nav aria-label="Navegación">
+        <a href="#introduccion">Introducción</a>
+        <a href="#arquitectura">Arquitectura</a>
+        <a href="#entrenamiento">Entrenamiento</a>
+        <a href="#aplicaciones">Aplicaciones</a>
+        <a href="#riesgos">Riesgos</a>
+        <a href="#preguntas">Preguntas</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <article class="hero-card">
+        <h1>GANs: apuntes claros, completos y listos para repasar</h1>
+        <p class="lead">
+          Este HTML convierte el contenido del PDF en una guía de estudio ordenada y directa. La idea es que puedas leerlo rápido,
+          entender la lógica general de las Redes Generativas Antagónicas y repasar antes del examen sin perderte en detalles innecesarios.
+        </p>
+        <div class="callout">
+          La idea más importante del tema es esta: una red crea datos artificiales y la otra los evalúa. Esa rivalidad hace que ambas aprendan.
+        </div>
+        <div class="pill-row">
+          <span class="pill">Generador</span>
+          <span class="pill">Discriminador</span>
+          <span class="pill">Datos sintéticos</span>
+          <span class="pill">Retroalimentación</span>
+          <span class="pill">Deepfakes</span>
+        </div>
+      </article>
+
+      <aside class="hero-card side-card">
+        <div>
+          <h2>Lo que sí o sí debes recordar</h2>
+          <p>Las GANs no solo reconocen patrones: también pueden generar contenido nuevo con apariencia realista.</p>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>2</strong><span>redes principales</span></div>
+          <div class="stat"><strong>1</strong><span>competencia continua</span></div>
+          <div class="stat"><strong>5+</strong><span>áreas de aplicación</span></div>
+          <div class="stat"><strong>1</strong><span>riesgo ético fuerte</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <main class="wrap">
+    <section id="introduccion">
+      <div class="section-title">
+        <h2>1. Introducción y contexto</h2>
+        <p class="subtitle">Definición, origen e idea central</p>
+      </div>
+      <article class="panel">
+        <p>
+          Las Redes Generativas Antagónicas, o GANs, son un modelo de inteligencia artificial formado por dos redes neuronales:
+          el generador y el discriminador. Su funcionamiento se basa en una relación de competencia constante, donde una red intenta
+          producir datos falsos pero creíbles y la otra intenta detectar si esos datos son reales o artificiales.
+        </p>
+        <p>
+          El PDF enfatiza que una GAN no es una sola red aislada, sino un sistema en el que ambos componentes se obligan mutuamente a mejorar.
+          Esa interacción es la razón por la que las GANs se volvieron tan importantes dentro del aprendizaje profundo moderno.
+        </p>
+        <div class="callout alt">
+          En resumen: una GAN aprende a crear datos nuevos a partir de ejemplos reales, y lo hace gracias al choque entre dos redes con objetivos opuestos.
+        </div>
+
+        <h3>Lo esencial de la idea</h3>
+        <ul>
+          <li>La red generadora produce muestras artificiales.</li>
+          <li>La red discriminadora decide si parecen reales.</li>
+          <li>Ambas redes aprenden durante la competencia.</li>
+          <li>El objetivo no es ganar una vez, sino mejorar continuamente.</li>
+        </ul>
+
+        <h3>Por qué es diferente de otros modelos</h3>
+        <p>
+          Muchos modelos de IA se concentran solo en analizar o clasificar. En cambio, las GANs también generan. Esa diferencia es clave:
+          no se limitan a identificar patrones, sino que producen contenido nuevo con estructura parecida a la de los datos de entrenamiento.
+        </p>
+      </article>
+    </section>
+
+    <section id="contexto">
+      <div class="section-title">
+        <h2>2. Contexto histórico e inspiración</h2>
+        <p class="subtitle">De las redes neuronales a las GANs</p>
+      </div>
+      <article class="panel">
+        <p>
+          El PDF comienza ubicando el tema dentro de la evolución de las redes neuronales artificiales. Primero se recuerda que una RNA es un
+          modelo computacional paramétrico diseñado para aproximar funciones complejas mediante procesamiento distribuido.
+        </p>
+        <p>
+          También se menciona la idea de inspiración biológica: las redes neuronales nacen como una abstracción matemática del cerebro humano,
+          aunque en la práctica no son un “cerebro digital”. Su funcionamiento real es computacional y está basado en operaciones numéricas.
+        </p>
+
+        <div class="mini-grid">
+          <div class="mini">
+            <strong>Inspiración biológica</strong>
+            <span>Las neuronas artificiales nacen como una analogía del sistema nervioso.</span>
+          </div>
+          <div class="mini">
+            <strong>Realidad computacional</strong>
+            <span>En la práctica trabajan con números, matrices y capas.</span>
+          </div>
+          <div class="mini">
+            <strong>Resurgimiento moderno</strong>
+            <span>El avance de las GPUs permitió entrenar redes más grandes y útiles.</span>
+          </div>
+          <div class="mini">
+            <strong>Salto a lo generativo</strong>
+            <span>La misma base matemática permitió pasar de clasificar a crear.</span>
+          </div>
+        </div>
+
+        <h3>Idea histórica importante</h3>
+        <p>
+          El documento también menciona que las GANs fueron propuestas por Ian Goodfellow en 2014. Esa propuesta marcó una evolución importante
+          porque abrió una nueva etapa en la inteligencia artificial: no solo reconocer patrones, sino generar información sintética convincente.
+        </p>
+      </article>
+    </section>
+
+    <section id="arquitectura">
+      <div class="section-title">
+        <h2>3. Arquitectura y funcionamiento interno</h2>
+        <p class="subtitle">Qué hace cada parte de la GAN</p>
+      </div>
+      <article class="panel">
+        <h3>3.1 Estructura general</h3>
+        <p>
+          Una GAN está compuesta por dos redes neuronales principales que trabajan en paralelo y se retroalimentan entre sí. El generador recibe
+          una entrada aleatoria y la transforma en una muestra sintética. Luego, el discriminador observa esa muestra y decide si se parece
+          a un dato real.
+        </p>
+        <p>
+          Esa relación de ida y vuelta es la base del aprendizaje adversarial. El generador intenta engañar; el discriminador intenta detectar el engaño.
+        </p>
+
+        <div class="mini-grid">
+          <div class="mini">
+            <strong>Generador</strong>
+            <span>Crea nuevas muestras a partir de ruido aleatorio.</span>
+          </div>
+          <div class="mini">
+            <strong>Discriminador</strong>
+            <span>Evalúa si una muestra parece auténtica.</span>
+          </div>
+          <div class="mini">
+            <strong>Entrada</strong>
+            <span>Se usa ruido o espacio latente, no imágenes reales.</span>
+          </div>
+          <div class="mini">
+            <strong>Salida</strong>
+            <span>Se busca una muestra sintética realista.</span>
+          </div>
+        </div>
+
+        <h3>3.2 El generador</h3>
+        <p>
+          El generador es la parte encargada de producir información artificial. Su función es transformar datos aleatorios en una salida con
+          características similares a las del conjunto de entrenamiento. Al inicio suele fallar mucho: produce formas poco coherentes,
+          imágenes deformes o resultados sin sentido.
+        </p>
+        <p>
+          Conforme recibe retroalimentación, aprende a construir muestras más estructuradas. El PDF insiste en que el generador no “imagina”
+          como una persona; simplemente transforma números para aproximarse a la distribución de los datos reales.
+        </p>
+
+        <h3>3.3 El discriminador</h3>
+        <p>
+          El discriminador analiza las muestras y decide si parecen reales o falsas. Funciona como un clasificador binario que compara patrones,
+          detalles visuales y consistencia general con respecto a los datos reales.
+        </p>
+        <p>
+          En imágenes, puede fijarse en bordes, texturas, colores y proporciones. Su tarea no es crear, sino detectar. Gracias a esa función,
+          empuja al generador a mejorar.
+        </p>
+
+        <h3>3.4 El espacio latente</h3>
+        <p>
+          El generador no recibe una imagen real como entrada. Recibe un vector de ruido aleatorio. Ese espacio latente actúa como una semilla
+          de diversidad, porque permite que pequeñas variaciones en la entrada produzcan resultados distintos.
+        </p>
+
+        <div class="callout warn">
+          El ruido no significa desorden inútil: es la base desde la que el generador explora distintas posibilidades de salida.
+        </div>
+
+        <h3>3.5 La arquitectura como flujo de información</h3>
+        <p>
+          El flujo de la GAN es sencillo de recordar: primero entra el ruido, luego el generador produce una muestra, después el discriminador la
+          evalúa y finalmente esa evaluación sirve para corregir el sistema. Esa retroalimentación es lo que hace que ambas redes mejoren.
+        </p>
+      </article>
+    </section>
+
+    <section id="trabajo">
+      <div class="section-title">
+        <h2>4. Cómo trabajan juntas</h2>
+        <p class="subtitle">Competencia, retroalimentación y mejora</p>
+      </div>
+      <article class="panel">
+        <p>
+          La competencia entre generador y discriminador es el corazón de una GAN. Si el generador produce resultados muy malos, el discriminador
+          los detecta con facilidad y el generador recibe una señal clara de que debe cambiar. Si el generador mejora, el discriminador también
+          debe reforzar su capacidad de análisis.
+        </p>
+        <p>
+          Esto convierte el entrenamiento en una especie de juego dinámico: ninguno debe vencer definitivamente, porque el objetivo real es
+          que ambos sigan aprendiendo.
+        </p>
+
+        <h3>Qué ocurre durante la interacción</h3>
+        <ol>
+          <li>Se toman datos reales como referencia.</li>
+          <li>El generador crea datos falsos a partir de ruido.</li>
+          <li>El discriminador compara ambas fuentes.</li>
+          <li>La diferencia entre sus respuestas guía el aprendizaje.</li>
+          <li>Se ajustan parámetros internos para mejorar el siguiente intento.</li>
+        </ol>
+
+        <div class="callout ok">
+          La competencia no destruye el aprendizaje: lo impulsa. Ese es el rasgo más importante de las GANs.
+        </div>
+      </article>
+    </section>
+
+    <section id="entrenamiento">
+      <div class="section-title">
+        <h2>5. Entrenamiento y matemática conceptual</h2>
+        <p class="subtitle">Sin fórmulas, solo la idea que te van a preguntar</p>
+      </div>
+      <article class="panel">
+        <p>
+          El entrenamiento de una GAN es un proceso iterativo de ajuste. En cada ronda, el generador produce muestras artificiales y el discriminador
+          revisa tanto datos reales como falsos. A partir de ese análisis, ambos reciben información útil para mejorar.
+        </p>
+        <p>
+          El PDF explica que el entrenamiento se apoya en errores, retroalimentación, optimización y actualización de parámetros. Aunque los
+          términos pueden sonar técnicos, la lógica es simple: probar, evaluar, corregir y repetir.
+        </p>
+
+        <h3>Pasos del entrenamiento</h3>
+        <ul>
+          <li>El generador recibe números aleatorios.</li>
+          <li>Los transforma en una muestra artificial.</li>
+          <li>El discriminador analiza muestras reales y falsas.</li>
+          <li>Ambas redes comparan resultados con lo esperado.</li>
+          <li>Se ajustan pesos y sesgos para mejorar la próxima iteración.</li>
+        </ul>
+
+        <h3>Qué significa la función de pérdida en palabras simples</h3>
+        <p>
+          La función de pérdida mide qué tan bien o qué tan mal está funcionando cada red. En el caso del discriminador, evalúa si clasifica bien;
+          en el caso del generador, mide si logra engañar al discriminador. Esa medición se convierte en una señal para corregir el modelo.
+        </p>
+
+        <h3>Retropropagación y descenso del gradiente</h3>
+        <p>
+          El PDF presenta la retropropagación como el mecanismo que envía el error hacia atrás, para identificar qué parámetros influyeron más
+          en el resultado final. Después aparece el descenso del gradiente como el procedimiento que convierte esa información en cambios reales
+          sobre los parámetros.
+        </p>
+        <p>
+          En simple: primero se descubre dónde está el error y luego se modifican los valores internos para reducirlo. Eso se repite muchas veces
+          hasta lograr un comportamiento mejor.
+        </p>
+
+        <div class="callout danger">
+          Si el entrenamiento está mal equilibrado, una red puede aprender demasiado rápido y bloquear el progreso de la otra.
+        </div>
+      </article>
+    </section>
+
+    <section id="aplicaciones">
+      <div class="section-title">
+        <h2>6. Aplicaciones y usos principales</h2>
+        <p class="subtitle">Dónde se aplican las GANs según el PDF</p>
+      </div>
+      <article class="panel">
+        <p>
+          El documento muestra que las GANs tienen impacto en muchas áreas porque pueden generar datos nuevos con apariencia realista. Esa
+          capacidad las vuelve útiles cuando hace falta crear contenido, restaurar imágenes o producir muestras sintéticas para otros sistemas.
+        </p>
+
+        <h3>Usos destacados</h3>
+        <ul>
+          <li>Generación de rostros humanos artificiales.</li>
+          <li>Creación de paisajes, animales y objetos sintéticos.</li>
+          <li>Restauración y mejora de imágenes dañadas.</li>
+          <li>Super-resolución para ampliar imágenes con más detalle.</li>
+          <li>Texturas, escenarios y personajes para videojuegos.</li>
+          <li>Filtros faciales, avatares y edición inteligente de imágenes.</li>
+          <li>Simulación de datos para entrenar otros modelos de IA.</li>
+          <li>Creación de contenido multimedia y apoyo a la producción visual.</li>
+        </ul>
+
+        <h3>Medicina y restauración</h3>
+        <p>
+          El PDF destaca su uso en medicina, donde las GANs pueden ayudar a mejorar imágenes obtenidas por resonancia, tomografía o radiografía.
+          También pueden generar datos sintéticos útiles cuando hay pocos ejemplos reales o restricciones de privacidad.
+        </p>
+        <p>
+          En restauración histórica y audiovisual, pueden recuperar detalles perdidos, eliminar ruido y mejorar imágenes antiguas o videos degradados.
+        </p>
+      </article>
+    </section>
+
+    <section id="ventajas">
+      <div class="section-title">
+        <h2>7. Ventajas</h2>
+        <p class="subtitle">Por qué son tan importantes</p>
+      </div>
+      <article class="panel">
+        <ul>
+          <li>Producen resultados muy realistas.</li>
+          <li>Aprenden patrones complejos directamente de los datos.</li>
+          <li>Sirven para generar conjuntos de datos sintéticos.</li>
+          <li>Ayudan a restaurar y mejorar imágenes.</li>
+          <li>Se adaptan a distintas áreas: imagen, audio, video, videojuegos y medicina.</li>
+          <li>Reducen trabajo manual en tareas de edición y generación.</li>
+        </ul>
+        <div class="callout alt">
+          Una ventaja muy fuerte es que no dependen de reglas escritas a mano. Aprenden patrones desde ejemplos reales.
+        </div>
+      </article>
+    </section>
+
+    <section id="problemas">
+      <div class="section-title">
+        <h2>8. Problemas y limitaciones</h2>
+        <p class="subtitle">Lo que complica su uso</p>
+      </div>
+      <article class="panel">
+        <p>
+          Aunque son poderosas, las GANs no son fáciles de entrenar. El PDF remarca que el proceso es inestable porque dos redes aprenden a la vez
+          y compiten continuamente. Esa condición hace que el equilibrio sea delicado.
+        </p>
+        <ul>
+          <li>Requieren muchas muestras de entrenamiento.</li>
+          <li>Necesitan alto poder computacional y uso intensivo de GPU.</li>
+          <li>El tiempo de entrenamiento puede ser largo.</li>
+          <li>No siempre es fácil medir la calidad de salida.</li>
+          <li>Pueden volverse repetitivas y perder diversidad.</li>
+        </ul>
+
+        <div class="callout warn">
+          El problema del <em>mode collapse</em> aparece cuando el generador aprende a repetir pocos ejemplos que engañan al discriminador, pero pierde variedad.
+        </div>
+      </article>
+    </section>
+
+    <section id="riesgos">
+      <div class="section-title">
+        <h2>9. Deepfakes y riesgos éticos</h2>
+        <p class="subtitle">La parte más delicada del tema</p>
+      </div>
+      <article class="panel">
+        <p>
+          Uno de los temas más debatidos sobre las GANs es la generación de deepfakes. El PDF explica que son imágenes, videos o audios falsificados
+          mediante inteligencia artificial que parecen reales. Suelen usarse para reemplazar rostros, imitar voces o producir material audiovisual
+          extremadamente convincente.
+        </p>
+        <p>
+          Esa capacidad puede usarse con fines creativos o de entretenimiento, pero también implica riesgos serios. El texto menciona
+          desinformación, suplantación de identidad, manipulación política, fraude digital, violación de privacidad y difusión de noticias falsas.
+        </p>
+
+        <h3>Por qué generan preocupación</h3>
+        <ul>
+          <li>Pueden engañar con apariencia realista.</li>
+          <li>Dificultan la verificación del contenido.</li>
+          <li>Amenazan la confianza pública.</li>
+          <li>Obligan a desarrollar sistemas de detección de contenido artificial.</li>
+        </ul>
+
+        <div class="callout danger">
+          La tecnología por sí sola no es el problema; el problema aparece cuando se usa para manipular o engañar.
+        </div>
+
+        <h3>Idea final de cierre</h3>
+        <p>
+          El PDF cierra recordando que el valor de las GANs depende del uso que se les dé. Pueden restaurar fotos, ayudar a generar datos útiles
+          y crear mundos virtuales, pero también pueden ser usadas para falsificar contenido de manera muy convincente.
+        </p>
+      </article>
+    </section>
+
+    <section id="resumen">
+      <div class="section-title">
+        <h2>10. Resumen final para memorizar</h2>
+        <p class="subtitle">Versión corta antes del examen</p>
+      </div>
+      <article class="panel">
+        <p>
+          Una GAN está formada por dos redes neuronales: el generador y el discriminador. El generador produce datos artificiales a partir
+          de ruido aleatorio. El discriminador analiza esas muestras y decide si parecen reales o falsas.
+        </p>
+        <p>
+          La competencia entre ambas redes permite que el sistema mejore de manera progresiva. Las GANs sirven para generar imágenes realistas,
+          restaurar contenido visual, crear datasets sintéticos y producir material multimedia. Su mayor fortaleza es generar datos nuevos;
+          su mayor debilidad es la dificultad del entrenamiento y el riesgo ético de los deepfakes.
+        </p>
+        <div class="callout ok">
+          Frase de examen: <strong>generar no es clasificar</strong>. El generador crea y el discriminador juzga.
+        </div>
+      </article>
+    </section>
+
+    <section id="preguntas">
+      <div class="section-title">
+        <h2>11. Preguntas tipo examen</h2>
+        <p class="subtitle">Opciones y respuesta correcta al final de cada una</p>
+      </div>
+
+      <div class="qa-grid">
+        <article class="qa-card">
+          <h3>1) ¿Qué es una GAN?</h3>
+          <ul class="options">
+            <li>a) Un modelo formado por una sola red que solo clasifica.</li>
+            <li>b) Un modelo con dos redes que compiten para generar y evaluar datos.</li>
+            <li>c) Un algoritmo que solo trabaja con texto.</li>
+            <li>d) Un sistema que no necesita entrenamiento.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Un modelo con dos redes que compiten para generar y evaluar datos. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>2) ¿Cuál es la función del generador?</h3>
+          <ul class="options">
+            <li>a) Revisar si una imagen es real o falsa.</li>
+            <li>b) Producir datos artificiales parecidos a los reales.</li>
+            <li>c) Eliminar el ruido del entrenamiento.</li>
+            <li>d) Clasificar únicamente datos reales.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Producir datos artificiales parecidos a los reales. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>3) ¿Cuál es la función del discriminador?</h3>
+          <ul class="options">
+            <li>a) Crear nuevas muestras desde ruido.</li>
+            <li>b) Evaluar si una muestra parece real o falsa.</li>
+            <li>c) Generar siempre imágenes exactas del entrenamiento.</li>
+            <li>d) Reemplazar por completo al generador.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Evaluar si una muestra parece real o falsa. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>4) ¿Qué se usa como entrada para el generador?</h3>
+          <ul class="options">
+            <li>a) Una imagen real ya terminada.</li>
+            <li>b) Un vector de ruido o espacio latente.</li>
+            <li>c) La salida del discriminador.</li>
+            <li>d) Un texto descriptivo obligatorio.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Un vector de ruido o espacio latente. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>5) ¿Por qué la GAN mejora con el tiempo?</h3>
+          <ul class="options">
+            <li>a) Porque el generador deja de cambiar.</li>
+            <li>b) Porque la competencia entre ambas redes les da retroalimentación.</li>
+            <li>c) Porque no necesita datos.</li>
+            <li>d) Porque el discriminador no aprende.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Porque la competencia entre ambas redes les da retroalimentación. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>6) ¿Qué significa que una GAN sea generativa?</h3>
+          <ul class="options">
+            <li>a) Que solo analiza datos antiguos.</li>
+            <li>b) Que puede crear nuevos datos artificiales.</li>
+            <li>c) Que elimina el entrenamiento.</li>
+            <li>d) Que trabaja únicamente con etiquetas.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Que puede crear nuevos datos artificiales. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>7) ¿Qué problema ocurre cuando el generador repite siempre resultados parecidos?</h3>
+          <ul class="options">
+            <li>a) Overfitting visual.</li>
+            <li>b) Mode collapse.</li>
+            <li>c) Desorden binario.</li>
+            <li>d) Pérdida total del discriminador.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Mode collapse. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>8) ¿Cuál de estas es una aplicación mencionada en el PDF?</h3>
+          <ul class="options">
+            <li>a) Restauración de imágenes deterioradas.</li>
+            <li>b) Reemplazo total del hardware.</li>
+            <li>c) Conversión de datos en lenguaje natural sin entrenamiento.</li>
+            <li>d) Eliminación del uso de GPUs.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Restauración de imágenes deterioradas. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>9) ¿Qué ventaja tienen las GANs?</h3>
+          <ul class="options">
+            <li>a) Producen datos realistas sin necesidad de reglas manuales.</li>
+            <li>b) No requieren datos reales de entrenamiento.</li>
+            <li>c) Solo sirven para imágenes de texto.</li>
+            <li>d) No pueden mejorar con el tiempo.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Producen datos realistas sin necesidad de reglas manuales. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>10) ¿Qué son los deepfakes?</h3>
+          <ul class="options">
+            <li>a) Errores de programación de una página web.</li>
+            <li>b) Contenido falsificado que parece real gracias a IA.</li>
+            <li>c) Una técnica para borrar imágenes.</li>
+            <li>d) Un tipo de dato que no usa redes neuronales.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Contenido falsificado que parece real gracias a IA. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>11) ¿Qué riesgo se relaciona con los deepfakes?</h3>
+          <ul class="options">
+            <li>a) Mayor confianza automática en internet.</li>
+            <li>b) Suplantación de identidad y desinformación.</li>
+            <li>c) Eliminación del contenido audiovisual.</li>
+            <li>d) Menor necesidad de verificar fuentes.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Suplantación de identidad y desinformación. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>12) ¿Por qué el ruido aleatorio es útil?</h3>
+          <ul class="options">
+            <li>a) Porque impide que la red cambie.</li>
+            <li>b) Porque introduce variedad en las salidas generadas.</li>
+            <li>c) Porque reemplaza al discriminador.</li>
+            <li>d) Porque hace innecesario el entrenamiento.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Porque introduce variedad en las salidas generadas. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>13) ¿Qué hace que el entrenamiento de una GAN sea difícil?</h3>
+          <ul class="options">
+            <li>a) Que solo tenga una red.</li>
+            <li>b) Que dos redes aprendan simultáneamente y en competencia.</li>
+            <li>c) Que no use datos.</li>
+            <li>d) Que siempre converge de inmediato.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Que dos redes aprendan simultáneamente y en competencia. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>14) ¿Qué papel cumple la retroalimentación?</h3>
+          <ul class="options">
+            <li>a) Informa a ambas redes para corregir y mejorar.</li>
+            <li>b) Borra los errores automáticamente.</li>
+            <li>c) Evita que el generador aprenda.</li>
+            <li>d) Sustituye al entrenamiento.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: a) Informa a ambas redes para corregir y mejorar. Buena opción: sí.</div>
+        </article>
+
+        <article class="qa-card">
+          <h3>15) ¿Cuál es el objetivo final de una GAN bien entrenada?</h3>
+          <ul class="options">
+            <li>a) Que el discriminador se detenga.</li>
+            <li>b) Que el generador cree datos realistas y convincentes.</li>
+            <li>c) Que no haya diferencias entre todas las salidas.</li>
+            <li>d) Que el sistema deje de aprender.</li>
+          </ul>
+          <div class="answer">Respuesta correcta: b) Que el generador cree datos realistas y convincentes. Buena opción: sí.</div>
+        </article>
+      </div>
+
+      <div class="nav-links">
+        <a class="button" href="#introduccion">Volver arriba</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Hecho solo con HTML5 y CSS3 puro. Todo el contenido está basado únicamente en el PDF proporcionado.
+  </footer>
+</body>
+</html>
