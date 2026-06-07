@@ -22,9 +22,9 @@ Desplegado en GitHub Pages:
 ├── cap1.html       # Visión por Computadora
 ├── cap2.html       # Procesamiento de Lenguaje Natural (PLN)
 ├── cap3.html       # Caso combinado: Análisis de sentimiento + Conclusiones
-├── cap4.html       # Razonamiento con Incertidumbre           (pendiente)
-├── cap5.html       # Redes Generativas Antagónicas (GANs)     (pendiente)
-├── cap6.html       # Algoritmos Genéticos                     (pendiente)
+├── cap4.html       # Razonamiento con Incertidumbre           
+├── cap5.html       # Redes Generativas Antagónicas (GANs)     
+├── cap6.html       # Algoritmos Genéticos                     
 └── README.md
 ```
 
@@ -34,9 +34,9 @@ Desplegado en GitHub Pages:
 
 | # | Tema | Archivo | Estado |
 |---|------|---------|--------|
-| 1 | Razonamiento con Incertidumbre | `cap4.html` |  Pendiente |
-| 2 | Redes Generativas Antagónicas (GANs) | `cap5.html` |  Pendiente |
-| 3 | Algoritmos Genéticos | `cap6.html` |  Pendiente |
+| 1 | Razonamiento con Incertidumbre | `Razonamiento_I.html` |  Listo |
+| 2 | Redes Generativas Antagónicas (GANs) | `Gan.html` |  Listo |
+| 3 | Algoritmos Genéticos | `ALgoritmosG.html` |  Listo |
 | 4 | Visión por Computadora | `cap1.html` |  Listo |
 | 5 | Procesamiento de Lenguaje Natural | `cap2.html` | Listo |
 
@@ -79,7 +79,36 @@ git push origin main
 
 ##  Contenido por capítulo
 
-### Cap. 1 — Visión por Computadora
+### Cap. 1 — Razonamiento con Incertidumbre
+
+* Variables aleatorias y distribuciones de probabilidad
+* Probabilidad conjunta, marginal y condicional
+* Inferencia probabilística y teorema de Bayes
+* Independencia condicional
+* Redes Bayesianas y representación del conocimiento incierto
+* Separación-d, poliárboles y métodos de inferencia
+
+### Cap. 2 — Redes Generativas Antagónicas (GANs)
+
+* Fundamentos de modelos generativos
+* Arquitectura Generador–Discriminador
+* Entrenamiento adversarial y función minimax
+* Proceso de aprendizaje y convergencia
+* Ventajas, limitaciones y desafíos de entrenamiento
+* Aplicaciones en generación y transformación de imágenes
+
+### Cap. 3 — Algoritmos Genéticos
+
+* Inspiración biológica y computación evolutiva
+* Representación mediante cromosomas y genes
+* Función de aptitud (Fitness)
+* Operadores de selección, cruce y mutación
+* Evolución de poblaciones y criterios de terminación
+* Aplicaciones en optimización y búsqueda de soluciones
+
+
+
+### Cap. 4 — Visión por Computadora
 - Imagen como dato numérico (muestreo, cuantización, histograma, ecualización)
 - Filtrado espacial (Gaussiano, Sobel, Prewitt)
 - Detector de bordes de Canny (pipeline completo de 4 etapas)
@@ -87,7 +116,7 @@ git push origin main
 - Geometría de cámara, calibración, estereovisión, triangulación 3D
 - Pipeline clásico de visión: SVM, k-NN, RANSAC
 
-### Cap. 2 — Procesamiento de Lenguaje Natural
+### Cap. 5 — Procesamiento de Lenguaje Natural
 - Fundamentos del PLN y niveles lingüísticos
 - Problemas del lenguaje: ambigüedad, variabilidad morfológica, Ley de Zipf
 - Pipeline clásico vs. sistemas extremo a extremo
@@ -97,7 +126,7 @@ git push origin main
 - Transformers, mecanismo de atención, positional encoding, LLMs
 - Subareas del PLN moderno
 
-### Cap. 3 — Caso Combinado y Conclusiones
+### Cap. 6 — Caso Combinado y Conclusiones
 - Análisis de sentimiento como pipeline completo de PLN
 - Función Softmax, métricas (Precisión, Recall, F1-Score)
 - Comparativa histórica: métodos clásicos vs. modernos en Visión y PLN
