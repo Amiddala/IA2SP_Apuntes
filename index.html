@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apuntes · Inteligencia Artificial II</title>
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:        #0d0f14;
+      --bg2:       #12151c;
+      --surface:   #181c26;
+      --border:    #252a38;
+      --text:      #e2e6f0;
+      --muted:     #7a849a;
+      --accent1:   #5b7fff;   /* visión */
+      --accent2:   #38cfb4;   /* PLN    */
+      --accent3:   #e88c5a;   /* combinado */
+      --font-head: 'Georgia', 'Times New Roman', serif;
+      --font-body: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      --font-mono: 'Courier New', Courier, monospace;
+    }
+
+    /* ─── RESET ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── HERO ────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 40%, rgba(91,127,255,.13) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, rgba(56,207,180,.09) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 10%, rgba(232,140,90,.07) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    /* subtle grid lines */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: .72rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      padding: .35rem 1rem;
+      border-radius: 99px;
+      margin-bottom: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-family: var(--font-head);
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 1.2rem;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent1); }
+    .hero p.subtitle {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin-bottom: 3rem;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-meta {
+      display: flex;
+      gap: 2.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+      margin-bottom: 4rem;
+    }
+    .hero-meta span {
+      font-size: .8rem;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+    .hero-meta span strong {
+      display: block;
+      color: var(--text);
+      font-size: .95rem;
+      margin-bottom: .1rem;
+    }
+    .scroll-hint {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      animation: float 2.4s ease-in-out infinite;
+    }
+    .scroll-hint::after {
+      content: '';
+      width: 1px;
+      height: 36px;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(6px); }
+    }
+
+    /* ─── SECTION ─────────────────────────────────────────── */
+    .section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+    .section-label {
+      font-size: .72rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+      font-weight: 400;
+      margin-bottom: 1rem;
+      letter-spacing: -.02em;
+    }
+    .section-intro {
+      max-width: 640px;
+      color: var(--muted);
+      margin-bottom: 3.5rem;
+    }
+
+    /* ─── CARDS GRID ──────────────────────────────────────── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem 1.8rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.4);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 14px 14px 0 0;
+      background: var(--card-accent, var(--accent1));
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .card:hover::before { opacity: 1; }
+
+    .card-num {
+      font-family: var(--font-mono);
+      font-size: .72rem;
+      color: var(--muted);
+      letter-spacing: .1em;
+      margin-bottom: 1rem;
+    }
+    .card-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.2rem;
+      background: color-mix(in srgb, var(--card-accent, var(--accent1)) 12%, transparent);
+    }
+    .card h3 {
+      font-family: var(--font-head);
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin-bottom: .6rem;
+      letter-spacing: -.01em;
+    }
+    .card p {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.6;
+      flex: 1;
+      margin-bottom: 1.8rem;
+    }
+    .card-topics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-bottom: 1.8rem;
+    }
+    .chip {
+      font-size: .68rem;
+      letter-spacing: .06em;
+      padding: .25rem .65rem;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--bg2);
+    }
+    .card-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--card-accent, var(--accent1));
+      letter-spacing: .04em;
+      transition: gap .2s;
+    }
+    .card-link:hover { gap: .9rem; }
+    .card-link::after { content: '→'; }
+
+    /* card accent overrides */
+    .card.vision  { --card-accent: var(--accent1); }
+    .card.pln     { --card-accent: var(--accent2); }
+    .card.combined{ --card-accent: var(--accent3); }
+    .card:hover.vision  { border-color: rgba(91,127,255,.3); }
+    .card:hover.pln     { border-color: rgba(56,207,180,.3); }
+    .card:hover.combined{ border-color: rgba(232,140,90,.3); }
+
+    /* ─── DIVIDER ─────────────────────────────────────────── */
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0 2rem;
+    }
+
+    /* ─── OVERVIEW STRIP ──────────────────────────────────── */
+    .overview {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .overview-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 3.5rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+    .stat strong {
+      display: block;
+      font-family: var(--font-head);
+      font-size: 2.2rem;
+      font-weight: 400;
+      letter-spacing: -.03em;
+      margin-bottom: .2rem;
+    }
+    .stat span {
+      font-size: .8rem;
+      color: var(--muted);
+      letter-spacing: .05em;
+    }
+    .stat.c1 strong { color: var(--accent1); }
+    .stat.c2 strong { color: var(--accent2); }
+    .stat.c3 strong { color: var(--accent3); }
+    .stat.c4 strong { color: #c07eff; }
+
+    /* ─── ABOUT ───────────────────────────────────────────── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    @media (max-width: 680px) { .about-grid { grid-template-columns: 1fr; gap: 2rem; } }
+    .about-grid .left p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      font-size: .95rem;
+    }
+    .about-grid .right {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.8rem;
+    }
+    .about-grid .right h4 {
+      font-size: .75rem;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .team-list { list-style: none; }
+    .team-list li {
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: .9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+    }
+    .team-list li:last-child { border-bottom: none; }
+    .team-list li span { color: var(--text); }
+
+    /* ─── FOOTER ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: .8rem;
+    }
+    footer strong { color: var(--text); }
+
+    /* ─── FADE-IN ANIMATION ───────────────────────────────── */
+    .fade-in { opacity: 0; transform: translateY(22px); transition: opacity .6s, transform .6s; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <span class="hero-badge">UMSS · Facultad de Ciencias y Tecnología</span>
+    <h1>Apuntes de<br /><em>Inteligencia Artificial II</em></h1>
+    <p class="subtitle">
+      Síntesis académica de los algoritmos fundamentales de
+      Visión por Computadora y Procesamiento de Lenguaje Natural.
+    </p>
+    <div class="hero-meta">
+      <span><strong>Materia</strong>Inteligencia Artificial II</span>
+      <span><strong>Docente</strong>Lic. Carmen Rosa Garcia Perez</span>
+      <span><strong>Año</strong>2026</span>
+      <span><strong>Capítulos</strong>3</span>
+    </div>
+    <div class="scroll-hint">Explorar</div>
+  </section>
+
+  <!-- ── STATS ─────────────────────────────────────────────── -->
+  <div class="overview">
+    <div class="overview-inner">
+      <div class="stat c1"><strong>12+</strong><span>Algoritmos de Visión</span></div>
+      <div class="stat c2"><strong>10+</strong><span>Temas de PLN</span></div>
+      <div class="stat c3"><strong>3</strong><span>Capítulos temáticos</span></div>
+      <div class="stat c4"><strong>2</strong><span>Grupos de estudio</span></div>
+    </div>
+  </div>
+
+  <!-- ── CARDS ─────────────────────────────────────────────── -->
+  <section class="section fade-in">
+    <p class="section-label">Índice de contenidos</p>
+    <h2 class="section-title">Elige un capítulo</h2>
+    <p class="section-intro">
+      Cada capítulo condensa la teoría esencial con fórmulas, propósito, ventajas, desventajas y
+      aplicaciones prácticas de cada algoritmo.
+    </p>
+
+    <div class="cards">
+
+      <!-- CAP 1 -->
+      <article class="card vision">
+        <span class="card-num">01 —</span>
+        <div class="card-icon">👁️</div>
+        <h3>Visión por Computadora</h3>
+        <p>
+          Desde la representación numérica de la imagen hasta la reconstrucción 3D. Filtros,
+          detección de bordes, puntos clave, descriptores y geometría epipolar.
+        </p>
+        <div class="card-topics">
+          <span class="chip">Imagen digital</span>
+          <span class="chip">Convolución 2D</span>
+          <span class="chip">Canny</span>
+          <span class="chip">SIFT</span>
+          <span class="chip">Harris</span>
+          <span class="chip">SVM · k-NN</span>
+          <span class="chip">Estereovisión</span>
+        </div>
+        <a href="cap1.html" class="card-link">Ir al capítulo</a>
+      </article>
+
+      <!-- CAP 2 -->
+      <article class="card pln">
+        <span class="card-num">02 —</span>
+        <div class="card-icon">🔤</div>
+        <h3>Procesamiento de Lenguaje Natural</h3>
+        <p>
+          De las representaciones clásicas (BoW, TF-IDF) a los Transformers y LLMs.
+          Modelos estadísticos, Deep Learning y subareas del PLN moderno.
+        </p>
+        <div class="card-topics">
+          <span class="chip">Tokenización</span>
+          <span class="chip">Word Embeddings</span>
+          <span class="chip">Naive Bayes</span>
+          <span class="chip">HMM · CRF</span>
+          <span class="chip">LSTM · GRU</span>
+          <span class="chip">Transformers</span>
+          <span class="chip">LLMs</span>
+        </div>
+        <a href="cap2.html" class="card-link">Ir al capítulo</a>
+      </article>
+
+      <!-- CAP 3 -->
+      <article class="card combined">
+        <span class="card-num">03 —</span>
+        <div class="card-icon">⚡</div>
+        <h3>Caso Combinado &amp; Conclusiones</h3>
+        <p>
+          Análisis de sentimiento como ejemplo completo de PLN. Comparativa entre
+          paradigmas clásicos y modernos, y nexos entre Visión y Lenguaje.
+        </p>
+        <div class="card-topics">
+          <span class="chip">Análisis de sentimiento</span>
+          <span class="chip">Pipeline completo</span>
+          <span class="chip">Softmax</span>
+          <span class="chip">Evaluación</span>
+          <span class="chip">Comparativa IA</span>
+        </div>
+        <a href="cap3.html" class="card-link">Ir al capítulo</a>
+      </article>
+
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- ── ABOUT ──────────────────────────────────────────────── -->
+  <section class="section fade-in">
+    <p class="section-label">Sobre estos apuntes</p>
+    <h2 class="section-title">¿Qué encontrarás aquí?</h2>
+    <div class="about-grid">
+      <div class="left">
+        <p>
+          Este sitio reúne la síntesis académica de dos trabajos de exposición presentados en la
+          materia <strong>Inteligencia Artificial II</strong> de la Universidad Mayor de San Simón.
+        </p>
+        <p>
+          Los apuntes están diseñados para el estudio rápido y eficiente: cada concepto se
+          explica con su propósito, formulación matemática clave, ventajas, desventajas y
+          aplicaciones reales. No son una copia literal de los documentos originales; son una
+          destilación orientada a la comprensión.
+        </p>
+        <p>
+          El orden sigue una progresión lógica: primero los fundamentos de representación,
+          luego los algoritmos clásicos, y finalmente los enfoques modernos basados en redes
+          neuronales y Transformers.
+        </p>
+      </div>
+      <div class="right">
+        <h4>Grupos de estudio</h4>
+        <ul class="team-list">
+          <li><span>Brenda Vargas Mollo</span> PLN</li>
+          <li><span>Jaime Chavarria Fuertes</span> PLN</li>
+          <li><span>Jessica Quispe Rico</span> PLN</li>
+          <li><span>Gabriel Camacho Terceros</span> PLN</li>
+          <li><span>Marcelo Mirabal Ferrel</span> PLN</li>
+          <li><span>Alisson Alvarado</span> Visión</li>
+          <li><span>Pablo Zuleta Novillo</span> Visión</li>
+          <li><span>Enrique Zuleta Novillo</span> Visión</li>
+          <li><span>Mairon Fernandez Orellana</span> Visión</li>
+          <li><span>Daniel Flores Olmos</span> Visión</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <footer>
+    <strong>Inteligencia Artificial II</strong> · UMSS Facultad de Ciencias y Tecnología ·
+    Cochabamba, Bolivia · 2026
+  </footer>
+
+  <script>
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: .12 });
+    document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+  </script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cap. 1 · Visión por Computadora</title>
+  <style>
+    :root{--bg:#0d0f14;--bg2:#12151c;--surface:#181c26;--border:#252a38;--text:#e2e6f0;--muted:#7a849a;--accent:#5b7fff;--accent-dim:#1e2d5e;--green:#38cfb4;--orange:#e88c5a;--red:#e05c6a;--font-head:'Georgia','Times New Roman',serif;--font-body:'Segoe UI','Helvetica Neue',Arial,sans-serif;--font-mono:'Courier New',Courier,monospace;--max-w:800px}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:16px;line-height:1.8}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:.85rem 2rem;gap:1rem;flex-wrap:wrap}
+    .nav-back{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);transition:color .2s}
+    .nav-back:hover{color:var(--text);text-decoration:none}
+    .nav-back::before{content:'← '}
+    .nav-title{font-family:var(--font-head);font-size:.95rem;color:var(--text);flex:1;text-align:center}
+    .nav-next{display:inline-flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--muted);transition:color .2s}
+    .nav-next:hover{color:var(--text);text-decoration:none}
+    .nav-next::after{content:' →'}
+    .ch-header{max-width:var(--max-w);margin:0 auto;padding:4rem 2rem 2.5rem}
+    .ch-tag{display:inline-block;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-dim);background:rgba(91,127,255,.06);padding:.3rem .85rem;border-radius:99px;margin-bottom:1.2rem}
+    .ch-header h1{font-family:var(--font-head);font-size:clamp(2rem,5vw,3.2rem);font-weight:400;letter-spacing:-.025em;line-height:1.2;margin-bottom:1rem}
+    .ch-header .lead{color:var(--muted);max-width:600px;font-size:1.05rem}
+    .ch-divider{max-width:var(--max-w);margin:2rem auto 0;padding:0 2rem;border:none;border-top:1px solid var(--border)}
+    main{max-width:var(--max-w);margin:0 auto;padding:3rem 2rem 6rem}
+    .toc{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:1.5rem 1.8rem;margin-bottom:3.5rem}
+    .toc h4{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+    .toc ol{padding-left:1.2rem}
+    .toc li{font-size:.88rem;color:var(--muted);margin-bottom:.35rem}
+    .toc li a{color:var(--muted);transition:color .2s}
+    .toc li a:hover{color:var(--accent);text-decoration:none}
+    h2{font-family:var(--font-head);font-size:1.75rem;font-weight:400;letter-spacing:-.02em;margin:3.5rem 0 1rem;color:var(--text);padding-bottom:.5rem;border-bottom:1px solid var(--border)}
+    h3{font-family:var(--font-head);font-size:1.2rem;font-weight:400;margin:2rem 0 .6rem;color:var(--text)}
+    h3::before{content:'// ';color:var(--accent);font-family:var(--font-mono);font-size:.9em}
+    p{margin-bottom:1rem;color:var(--text)}
+    ul,ol{padding-left:1.4rem;margin-bottom:1rem}
+    li{margin-bottom:.4rem;color:var(--muted)}
+    li strong{color:var(--text)}
+    .concept{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem 1.8rem;margin:1.5rem 0}
+    .concept-title{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+    .concept p{color:var(--muted);margin:0}
+    .formula{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:8px;padding:1rem 1.5rem;font-family:var(--font-mono);font-size:.88rem;color:var(--green);margin:1.2rem 0;overflow-x:auto;white-space:pre-wrap}
+    .formula .note{color:var(--muted);font-size:.78rem;display:block;margin-top:.4rem;font-family:var(--font-body)}
+    .alert{border-left:3px solid var(--orange);background:rgba(232,140,90,.06);border-radius:0 8px 8px 0;padding:1rem 1.4rem;margin:1.5rem 0;font-size:.92rem;color:var(--muted)}
+    .alert strong{color:var(--orange)}
+    .procon{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.2rem 0}
+    @media(max-width:520px){.procon{grid-template-columns:1fr}}
+    .procon-box{border-radius:10px;padding:1.1rem 1.3rem}
+    .pros{background:rgba(56,207,180,.06);border:1px solid rgba(56,207,180,.2)}
+    .cons{background:rgba(224,92,106,.06);border:1px solid rgba(224,92,106,.2)}
+    .procon-box h5{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.7rem}
+    .pros h5{color:var(--green)}
+    .cons h5{color:var(--red)}
+    .procon-box ul{padding-left:1.1rem;margin:0}
+    .procon-box li{font-size:.85rem;margin-bottom:.3rem;color:var(--muted)}
+    .steps{counter-reset:step;list-style:none;padding:0;margin:1.2rem 0}
+    .steps li{counter-increment:step;display:flex;gap:1rem;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid var(--border);color:var(--text);font-size:.92rem}
+    .steps li:last-child{border-bottom:none}
+    .steps li::before{content:counter(step,decimal-leading-zero);font-family:var(--font-mono);font-size:.75rem;color:var(--accent);min-width:28px;padding-top:.1rem}
+    .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin:.8rem 0}
+    .tag{font-size:.68rem;letter-spacing:.07em;padding:.22rem .65rem;border-radius:99px;border:1px solid var(--border);color:var(--muted);background:var(--bg2)}
+    .section-anchor{scroll-margin-top:70px}
+    .footer-nav{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding:2rem;max-width:var(--max-w);margin:0 auto;flex-wrap:wrap;gap:1rem}
+    .footer-nav a{font-size:.85rem;color:var(--muted);transition:color .2s}
+    .footer-nav a:hover{color:var(--text);text-decoration:none}
+    .footer-nav .prev::before{content:'← '}
+    .footer-nav .next::after{content:' →'}
+    table{width:100%;border-collapse:collapse;margin:1.2rem 0;font-size:.88rem}
+    th{background:var(--surface);color:var(--accent);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1rem;text-align:left;border-bottom:2px solid var(--border)}
+    td{padding:.6rem 1rem;border-bottom:1px solid var(--border);color:var(--muted)}
+    tr:last-child td{border-bottom:none}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-back">Índice</a>
+  <span class="nav-title">Cap. 1 · Visión por Computadora</span>
+  <a href="cap2.html" class="nav-next">Cap. 2</a>
+</nav>
+
+<div class="ch-header">
+  <span class="ch-tag">Capítulo 01</span>
+  <h1>Visión por Computadora</h1>
+  <p class="lead">Fundamentos matemáticos del procesamiento de imágenes, filtrado espacial, detección de características y reconstrucción geométrica 3D.</p>
+</div>
+<hr class="ch-divider" />
+
+<main>
+
+  <nav class="toc">
+    <h4>Contenido</h4>
+    <ol>
+      <li><a href="#imagen">1. La imagen como dato numérico</a></li>
+      <li><a href="#filtrado">2. Filtrado y detección de bordes</a></li>
+      <li><a href="#puntos">3. Puntos clave y descriptores</a></li>
+      <li><a href="#geometria">4. Geometría y múltiples vistas</a></li>
+      <li><a href="#pipeline">5. Pipeline clásico y clasificadores</a></li>
+    </ol>
+  </nav>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="imagen" class="section-anchor">1. La imagen como dato numérico</h2>
+
+  <p>Una cámara convierte la escena continua del mundo real en una <strong>rejilla finita de valores enteros</strong> mediante dos pasos:</p>
+  <ul>
+    <li><strong>Muestreo:</strong> se elige cuántos puntos representar (resolución, ej. 1920×1080).</li>
+    <li><strong>Cuantización:</strong> cada intensidad continua se redondea a un nivel entero (rango dinámico).</li>
+  </ul>
+
+  <h3>Representación matricial</h3>
+  <p>Una <strong>imagen en grises</strong> es una matriz 2D. Cada celda almacena un entero donde 0 = negro y 255 = blanco. Una <strong>imagen RGB</strong> es un tensor 3D con tres matrices apiladas (R, G, B).</p>
+  <div class="formula">f(x, y)  →  entero ∈ [0, 255]   (8 bits / canal)
+<span class="note">x = columna,  y = fila,  valor = intensidad del píxel</span></div>
+
+  <h3>Rango dinámico</h3>
+  <div class="procon">
+    <div class="procon-box pros">
+      <h5>8 bits — 256 niveles</h5>
+      <ul>
+        <li>Suficiente para fotografía cotidiana</li>
+        <li>Bajo consumo de memoria</li>
+        <li>Estándar universal (JPEG, PNG)</li>
+      </ul>
+    </div>
+    <div class="procon-box cons">
+      <h5>16 bits — 65 536 niveles</h5>
+      <ul>
+        <li>Gradientes muy sutiles (medicina, astronomía)</li>
+        <li>Mayor espacio en disco y RAM</li>
+        <li>Edición no destructiva</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Histograma e igualización</h3>
+  <p>El <strong>histograma</strong> cuenta cuántos píxeles tienen cada nivel de intensidad. La <strong>igualización</strong> redistribuye esos niveles para maximizar contraste usando la función de distribución acumulada (CDF):</p>
+  <div class="formula">g = [ CDF(v) − CDF_min ] / [ N − CDF_min ]  ×  255
+<span class="note">v = valor original del píxel | N = total de píxeles | CDF_min = mínimo no nulo</span></div>
+
+  <div class="alert"><strong>Aplicación práctica:</strong> la igualización revela detalles invisibles en imágenes subexpuestas o con poco contraste, muy útil como preprocesado antes de detectar bordes u objetos.</div>
+
+  <h3>Operaciones punto a punto</h3>
+  <p>Se aplican píxel a píxel, sin considerar vecinos:</p>
+  <ul>
+    <li><strong>Suma de constante:</strong> eleva el brillo global (desplaza histograma a la derecha).</li>
+    <li><strong>Resta:</strong> baja brillo; comparar dos imágenes detecta cambios.</li>
+    <li><strong>Multiplicación por escalar:</strong> amplifica (&gt;1) o comprime (&lt;1) el contraste.</li>
+  </ul>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="filtrado" class="section-anchor">2. Filtrado y detección de bordes</h2>
+
+  <h3>Convolución 2D — el motor del procesamiento espacial</h3>
+  <p>La mayoría de operaciones de filtrado se implementan como una <strong>convolución 2D</strong>: se desliza un pequeño kernel (matriz de coeficientes) sobre la imagen y se calcula un nuevo valor para cada píxel como suma ponderada de su vecindad.</p>
+  <div class="concept">
+    <div class="concept-title">Kernel / Máscara</div>
+    <p>Matriz de dimensiones impares (3×3, 5×5…). Sus coeficientes determinan el tipo de efecto: suavizado, realce de bordes, nitidez, etc.</p>
+  </div>
+
+  <h3>Filtros de paso bajo — suavizado</h3>
+  <p>Atenúan variaciones de alta frecuencia (ruido, detalles finos) y preservan las zonas uniformes.</p>
+  <table>
+    <tr><th>Filtro</th><th>Kernel</th><th>Característica</th><th>Uso típico</th></tr>
+    <tr><td>Promedio</td><td>Coeficientes iguales</td><td>Rápido; difumina bordes reales</td><td>Preprocesado rápido</td></tr>
+    <tr><td>Gaussiano</td><td>Distribución normal 2D</td><td>Peso decae desde el centro; preserva mejor la estructura</td><td>Eliminación de ruido blanco</td></tr>
+  </table>
+  <div class="formula">G(x,y) = 1/(2πσ²) · exp(−(x²+y²)/(2σ²))
+<span class="note">σ controla la dispersión del desenfoque</span></div>
+
+  <h3>Filtros de paso alto — detección de bordes</h3>
+  <p>Resaltan cambios bruscos de intensidad actuando como <em>derivadas espaciales</em>.</p>
+  <ul>
+    <li><strong>Prewitt:</strong> calcula diferencias de forma directa con dos kernels (horizontal y vertical).</li>
+    <li><strong>Sobel:</strong> añade peso extra en la fila/columna central, lo que reduce sensibilidad al ruido comparado con Prewitt.</li>
+  </ul>
+
+  <h3>Detector de Canny — el estándar de la industria</h3>
+  <p>Propuesto por John F. Canny (1986). No es solo un filtro; es un <em>pipeline algorítmico</em> de cuatro etapas que produce bordes delgados (1 px), con baja tasa de error y buena localización.</p>
+  <ol class="steps">
+    <li><strong>Suavizado Gaussiano:</strong> elimina ruido antes de calcular gradientes.</li>
+    <li><strong>Cálculo del gradiente:</strong> aplica Sobel para obtener magnitud y dirección.
+      <div class="formula" style="margin-top:.6rem">Magnitud = √(Gx² + Gy²)    Dirección θ = arctan(Gy / Gx)</div>
+    </li>
+    <li><strong>Supresión de no-máximos:</strong> adelgaza bordes comparando cada píxel con sus vecinos en la dirección del gradiente; se conserva solo el máximo local.</li>
+    <li><strong>Umbralización por histéresis:</strong> usa dos umbrales (T_alto, T_bajo).
+      <ul style="margin-top:.4rem">
+        <li>Gradiente > T_alto → borde fuerte (confirmado).</li>
+        <li>Entre T_bajo y T_alto → borde débil; solo se conserva si conecta a un borde fuerte.</li>
+        <li>Por debajo de T_bajo → descartado.</li>
+      </ul>
+    </li>
+  </ol>
+  <div class="procon">
+    <div class="procon-box pros">
+      <h5>Ventajas de Canny</h5>
+      <ul>
+        <li>Bordes de 1 px de grosor</li>
+        <li>Bajo número de falsos positivos</li>
+        <li>Configurable con dos umbrales</li>
+      </ul>
+    </div>
+    <div class="procon-box cons">
+      <h5>Limitaciones</h5>
+      <ul>
+        <li>Más lento que Sobel/Prewitt</li>
+        <li>Sensible a elección de σ</li>
+        <li>Puede fragmentar bordes continuos</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="puntos" class="section-anchor">3. Puntos clave y descriptores</h2>
+
+  <p>Un <strong>punto clave</strong> es una región distintiva de la imagen que puede identificarse y rastrearse aunque cambie la escala, la rotación o la iluminación.</p>
+
+  <h3>Tipos de puntos clave</h3>
+  <table>
+    <tr><th>Tipo</th><th>Descripción</th><th>Algoritmos</th></tr>
+    <tr><td>Esquinas</td><td>Cambio brusco de dirección de borde en todas las direcciones</td><td>Harris, Shi-Tomasi</td></tr>
+    <tr><td>Blobs</td><td>Región con intensidad/color diferente al entorno (manchas, círculos)</td><td>LoG, DoG, SIFT</td></tr>
+    <tr><td>Puntos estables</td><td>Reconocibles bajo cambios de escala, rotación e iluminación</td><td>SIFT, SURF, ORB</td></tr>
+  </table>
+
+  <h3>Harris Corner Detector</h3>
+  <p>Analiza cómo varía la intensidad al desplazar una ventana en distintas direcciones usando la <strong>matriz de estructura</strong> M:</p>
+  <div class="formula">M = [ Ix²    IxIy ]
+    [ IxIy   Iy²  ]
+
+R = det(M) − k·(trace(M))²
+<span class="note">R grande → esquina | R negativo → borde | R pequeño → zona plana | k ≈ 0.04–0.06</span></div>
+  <div class="procon">
+    <div class="procon-box pros">
+      <h5>Ventajas</h5>
+      <ul><li>Simple y rápido</li><li>Alta precisión en esquinas</li><li>Invariante a rotación</li></ul>
+    </div>
+    <div class="procon-box cons">
+      <h5>Desventajas</h5>
+      <ul><li>No maneja bien cambios de escala</li><li>Sensible a ruido</li></ul>
+    </div>
+  </div>
+
+  <h3>SIFT — Scale-Invariant Feature Transform</h3>
+  <p>Desarrollado por David Lowe. Detecta y describe puntos clave de forma <strong>invariante a escala, rotación y variaciones de iluminación</strong>.</p>
+  <ol class="steps">
+    <li><strong>Detección de puntos:</strong> busca regiones importantes en un espacio escala (pirámide de DoG).</li>
+    <li><strong>Orientación:</strong> asigna una dirección principal al punto basada en el histograma de gradientes locales.</li>
+    <li><strong>Descriptor:</strong> divide la vecindad en subregiones 4×4 y calcula histogramas de gradientes orientados en 8 direcciones → vector de 128 dimensiones.</li>
+  </ol>
+  <div class="alert"><strong>Concepto clave:</strong> el descriptor SIFT de 128 dimensiones actúa como una "huella digital" del punto clave, permitiendo compararlo con puntos de otras imágenes de forma robusta.</div>
+
+  <h3>Matching de descriptores</h3>
+  <p>Para encontrar el mismo punto en dos imágenes se comparan descriptores con métricas de distancia:</p>
+  <div class="formula">SIFT  →  Distancia Euclidiana:  d = √Σ(xi − yi)²
+ORB   →  Distancia de Hamming:  cuenta bits diferentes
+<span class="note">Descriptores con d pequeña son candidatos a corresponder al mismo punto 3D</span></div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="geometria" class="section-anchor">4. Geometría y múltiples vistas</h2>
+
+  <h3>Modelo de cámara estenopeica (pinhole)</h3>
+  <p>La <strong>matriz de cámara P</strong> transforma un punto 3D del mundo real en coordenadas de píxeles 2D:</p>
+  <ul>
+    <li><strong>Parámetros intrínsecos (K):</strong> propiedades internas fijas: distancia focal (fx, fy), punto principal (cx, cy) y factor de inclinación (skew).</li>
+    <li><strong>Parámetros extrínsecos [R|t]:</strong> posición y orientación de la cámara en el mundo (rotación R, traslación t).</li>
+  </ul>
+
+  <h3>Calibración de la cámara</h3>
+  <p>Para calibrar se fotografía un tablero de ajedrez desde múltiples ángulos. Cada esquina del tablero proporciona una correspondencia 3D↔2D. El sistema de ecuaciones se resuelve con el método <strong>DLT (Direct Linear Transform)</strong> y se optimiza con algoritmos no lineales para corregir distorsión radial.</p>
+
+  <h3>Estereovisión</h3>
+  <p>Dos cámaras separadas por una distancia <em>B</em> (línea base) replican la visión binocular humana para estimar profundidad.</p>
+  <div class="formula">Profundidad (Z) = f · B / d
+<span class="note">f = distancia focal | B = línea base | d = disparidad (diferencia de posición en px entre imagen izq. y der.)</span></div>
+  <p>La <strong>geometría epipolar</strong> restringe la búsqueda de correspondencias a una línea (la línea epipolar), pasando de buscar en 2D a buscar en 1D, lo que acelera enormemente el proceso.</p>
+
+  <h3>Triangulación 3D</h3>
+  <p>Dado un par de puntos correspondientes en dos imágenes, se trazan rayos desde cada centro óptico. En teoría se intersectan en el punto 3D real. En la práctica el ruido impide la intersección exacta, por lo que se usa <strong>mínimos cuadrados</strong> para encontrar el punto que minimiza el error de reproyección. El resultado es una <strong>nube de puntos 3D</strong> de la escena.</p>
+
+  <!-- ════════════════════════════════════════════ -->
+  <h2 id="pipeline" class="section-anchor">5. Pipeline clásico y clasificadores</h2>
+
+  <h3>Estructura del pipeline de visión</h3>
+  <p>El pipeline clásico procesa la imagen de forma <strong>secuencial</strong> hasta producir una decisión:</p>
+  <ol class="steps">
+    <li><strong>Captura:</strong> la cámara obtiene la imagen; se corrige iluminación si es necesario.</li>
+    <li><strong>Preprocesado:</strong> filtros para reducir ruido y mejorar contraste.</li>
+    <li><strong>Extracción de características:</strong> bordes, esquinas, texturas, formas → vector numérico.</li>
+    <li><strong>Clasificación / estimación:</strong> SVM, k-NN u otro clasificador decide la categoría.</li>
+    <li><strong>Acción:</strong> el sistema ejecuta la decisión (ej. el robot frena ante un obstáculo).</li>
+  </ol>
+
+  <h3>SVM — Máquina de Vectores Soporte</h3>
+  <p>Busca el <strong>hiperplano de máximo margen</strong> que separa las clases de datos. Los puntos más cercanos a esa frontera se llaman <em>vectores soporte</em>.</p>
+  <div class="procon">
+    <div class="procon-box pros">
+      <h5>Ventajas</h5>
+      <ul>
+        <li>Funciona bien con datos de alta dimensión</li>
+        <li>Robusto frente al sobreajuste</li>
+        <li>Kernels para separaciones no lineales</li>
+      </ul>
+    </div>
+    <div class="procon-box cons">
+      <h5>Desventajas</h5>
+      <ul>
+        <li>Lento con grandes conjuntos de datos</li>
+        <li>Sensible a la elección del kernel y parámetros</li>
+        <li>Poca interpretabilidad</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>k-NN — k vecinos más cercanos</h3>
+  <p>Clasifica un nuevo ejemplo buscando los <em>k</em> ejemplos más similares en el conjunto de entrenamiento y haciendo <strong>votación por mayoría</strong>.</p>
+  <div class="alert"><strong>Idea clave:</strong> no hay entrenamiento explícito; todo el trabajo ocurre en la consulta. Sencillo de implementar, pero lento con bases de datos grandes porque debe calcular la distancia a todos los ejemplos almacenados.</div>
+
+  <h3>RANSAC — eliminación de outliers</h3>
+  <p>Algoritmo robusto para ajustar modelos cuando los datos contienen errores o coincidencias incorrectas (outliers). Funciona iterando:</p>
+  <ol class="steps">
+    <li>Seleccionar aleatoriamente un subconjunto mínimo de puntos.</li>
+    <li>Calcular un modelo candidato con esos puntos.</li>
+    <li>Contar cuántos puntos totales son consistentes con el modelo (inliers).</li>
+    <li>Conservar el modelo con más inliers tras N iteraciones.</li>
+  </ol>
+
+  <h3>Validación y sobreajuste</h3>
+  <p>El conjunto de datos se divide en <strong>entrenamiento</strong> (aprender patrones) y <strong>prueba</strong> (evaluar generalización). El <em>sobreajuste</em> ocurre cuando el modelo memoriza el entrenamiento pero falla con datos nuevos; se mitiga con más datos, regularización o ajuste fino de parámetros.</p>
+
+  <div class="tags">
+    <span class="tag">Imagen digital</span>
+    <span class="tag">Convolución 2D</span>
+    <span class="tag">Filtro Gaussiano</span>
+    <span class="tag">Detector de Canny</span>
+    <span class="tag">Harris Corner</span>
+    <span class="tag">SIFT</span>
+    <span class="tag">ORB</span>
+    <span class="tag">Estereovisión</span>
+    <span class="tag">SVM</span>
+    <span class="tag">k-NN</span>
+    <span class="tag">RANSAC</span>
+  </div>
+
+</main>
+
+<div class="footer-nav">
+  <a href="index.html" class="prev">Índice</a>
+  <a href="cap2.html" class="next">Cap. 2 — PLN</a>
+</div>
+
+</body>
+</html>
